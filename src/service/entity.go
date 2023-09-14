@@ -7,12 +7,13 @@ type File struct {
 }
 
 type Instructor struct {
-	Id          int64
-	FullName    string
-	Email       string
-	PhoneNumber string
-	Website     string
-	Degree      string
+	Id             int64
+	FullName       string
+	Email          string
+	PhoneNumber    string
+	Website        string
+	Degree         string
+	TaughtSubjects []Subject
 }
 
 type Subject struct {
