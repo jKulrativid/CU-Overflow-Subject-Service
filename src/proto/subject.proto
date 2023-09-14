@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+import "entity.proto";
+
+service SubjectService {
+	rpc PaginateSubjects(PaginateSubjectRequest) returns (PaginateSubjectResponse);
+	rpc GetSubjectBySubjectId(GetSubjectByIdRequest) returns (GetSubjectByIdResponse);
+	rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
+	rpc UpdateSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
+	rpc DeleteSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
+	rpc PaginatePostBySubject(PaginatePostBySubjectRequest) returns (PaginatePostBySubjectResponse);
+	rpc PaginateFileBySubject(PaginateFileBySubjectRequest) returns (PaginateFileBySubjectResponse);
+}
+
+message PaginateSubjectRequest {
+	int64 page_number = 1;
+	string subject_id = 2;
+	string name = 3;
+	repeated int64 semester_whitelist = 4;
+	int64 year_range_start = 5;
+	int64 year_range_stop = 6;
+}
+
+message PaginateSubjectResponse {
+	int64 page_number = 1;
+	int64 per_page = 2;
+	int64 page_count = 3;
+	int64 total_count = 4;
+	repeated SubjectMetadata subjects = 5;
+}
+
+message GetSubjectByIdRequest {
+	string subject_id = 1;
+}
+
+message GetSubjectByIdResponse {
+	Subject subject = 1;
+}
+
+message CreateSubjectRequest {
+	string subject_id = 1;
+	string name = 2;
+	int64 semester = 3;
+	int64 year = 4;
+	string faculty = 5;
+	string description = 6;
+	repeated int64 prerequisited_ids = 7;
+	repeated int64 instructor_ids = 8;
+}
+
+message CreateSubjectResponse {
+	Subject subject = 1;
+}
+
+message UpdateSubjectRequest {
+	string subject_id = 1;
+	string name = 2;
+	int64 semester = 3;
+	int64 year = 4;
+	string faculty = 5;
+	string description = 6;
+	repeated int64 prerequisited_ids = 7;
+	repeated int64 instructor_ids = 8;
+}
+
+message UpdateSubjectResponse {
+	Subject subject = 1;
+}
+
+message DeleteSubjectRequest {
+	string subject_id = 1;
+}
+
+message DeleteSubjectResponse {
+	Subject subject = 1;
+}
+
+message PaginatePostBySubjectRequest {}
+
+message PaginatePostBySubjectResponse {}
+
+message PaginateFileBySubjectRequest {}
+
+message PaginateFileBySubjectResponse {}

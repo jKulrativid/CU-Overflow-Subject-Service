@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+message Subject {
+	int64 id = 1;
+	string subject_id = 2;
+	string name = 3;
+	int64 semester = 4;
+	int64 year = 5;
+	string faculty = 6;
+	string description = 7;
+	repeated Subject prerequisites = 8;
+	repeated Instructor instructors = 9;
+}
+
+message SubjectMetadata {
+	int64 id = 1;
+	string subject_id = 2;
+	string name = 3;
+	int64 semester = 4;
+	int64 year = 5;
+}
+
+message Instructor {
+	int64 id = 1;
+	string full_name = 2;
+	string faculty = 3;
+	string email = 4;
+	string phone_number = 5;
+	string website = 6;
+	string degree = 7;
+	repeated Subject taught_subjects = 8;
+}
+
+message InstructorMetadata {
+	int64 id = 1;
+	string full_name = 2;
+}
+
+message PostMetadata {
+
+}
+
+message FileMetadata {
+
+}
