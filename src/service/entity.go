@@ -17,9 +17,11 @@ type Instructor struct {
 
 type Subject struct {
 	Id            int64
+	SubjectId     string
 	Name          string
 	Semester      int64
 	Year          int64
+	Faculty       string
 	Description   string
 	Prerequisites []Subject
 	Instructors   []Instructor
