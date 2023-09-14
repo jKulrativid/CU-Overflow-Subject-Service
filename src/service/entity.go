@@ -9,6 +9,7 @@ type File struct {
 type Instructor struct {
 	Id             int64
 	FullName       string
+	Faculty        string
 	Email          string
 	PhoneNumber    string
 	Website        string
