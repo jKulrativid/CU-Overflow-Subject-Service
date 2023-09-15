@@ -30,7 +30,7 @@ message PaginateSubjectResponse {
 }
 
 message GetSubjectByIdRequest {
-	string subject_id = 1;
+	string id = 1;
 }
 
 message GetSubjectByIdResponse {
