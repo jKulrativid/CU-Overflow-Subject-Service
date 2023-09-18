@@ -1,9 +1,11 @@
 package service
 
 type Post struct {
+	Id int64
 }
 
 type File struct {
+	Id int64
 }
 
 type Instructor struct {
