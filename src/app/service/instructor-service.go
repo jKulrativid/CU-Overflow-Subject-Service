@@ -1,8 +1,5 @@
 package service
 
-type InstructorRepository interface {
-}
-
 type InstructorService struct {
 }
 
