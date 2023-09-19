@@ -23,10 +23,10 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SubjectServiceClient interface {
 	PaginateSubjects(ctx context.Context, in *PaginateSubjectRequest, opts ...grpc.CallOption) (*PaginateSubjectResponse, error)
-	GetSubjectBySubjectId(ctx context.Context, in *GetSubjectByIdRequest, opts ...grpc.CallOption) (*GetSubjectByIdResponse, error)
+	GetSubjectById(ctx context.Context, in *GetSubjectByIdRequest, opts ...grpc.CallOption) (*GetSubjectByIdResponse, error)
 	CreateSubject(ctx context.Context, in *CreateSubjectRequest, opts ...grpc.CallOption) (*CreateSubjectResponse, error)
 	UpdateSubject(ctx context.Context, in *UpdateSubjectRequest, opts ...grpc.CallOption) (*UpdateSubjectResponse, error)
-	DeleteSubject(ctx context.Context, in *UpdateSubjectRequest, opts ...grpc.CallOption) (*UpdateSubjectResponse, error)
+	DeleteSubject(ctx context.Context, in *DeleteSubjectRequest, opts ...grpc.CallOption) (*DeleteSubjectResponse, error)
 	PaginatePostBySubject(ctx context.Context, in *PaginatePostBySubjectRequest, opts ...grpc.CallOption) (*PaginatePostBySubjectResponse, error)
 	PaginateFileBySubject(ctx context.Context, in *PaginateFileBySubjectRequest, opts ...grpc.CallOption) (*PaginateFileBySubjectResponse, error)
 }
@@ -48,9 +48,9 @@ func (c *subjectServiceClient) PaginateSubjects(ctx context.Context, in *Paginat
 	return out, nil
 }
 
-func (c *subjectServiceClient) GetSubjectBySubjectId(ctx context.Context, in *GetSubjectByIdRequest, opts ...grpc.CallOption) (*GetSubjectByIdResponse, error) {
+func (c *subjectServiceClient) GetSubjectById(ctx context.Context, in *GetSubjectByIdRequest, opts ...grpc.CallOption) (*GetSubjectByIdResponse, error) {
 	out := new(GetSubjectByIdResponse)
-	err := c.cc.Invoke(ctx, "/SubjectService/GetSubjectBySubjectId", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/SubjectService/GetSubjectById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +75,8 @@ func (c *subjectServiceClient) UpdateSubject(ctx context.Context, in *UpdateSubj
 	return out, nil
 }
 
-func (c *subjectServiceClient) DeleteSubject(ctx context.Context, in *UpdateSubjectRequest, opts ...grpc.CallOption) (*UpdateSubjectResponse, error) {
-	out := new(UpdateSubjectResponse)
+func (c *subjectServiceClient) DeleteSubject(ctx context.Context, in *DeleteSubjectRequest, opts ...grpc.CallOption) (*DeleteSubjectResponse, error) {
+	out := new(DeleteSubjectResponse)
 	err := c.cc.Invoke(ctx, "/SubjectService/DeleteSubject", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -107,10 +107,10 @@ func (c *subjectServiceClient) PaginateFileBySubject(ctx context.Context, in *Pa
 // for forward compatibility
 type SubjectServiceServer interface {
 	PaginateSubjects(context.Context, *PaginateSubjectRequest) (*PaginateSubjectResponse, error)
-	GetSubjectBySubjectId(context.Context, *GetSubjectByIdRequest) (*GetSubjectByIdResponse, error)
+	GetSubjectById(context.Context, *GetSubjectByIdRequest) (*GetSubjectByIdResponse, error)
 	CreateSubject(context.Context, *CreateSubjectRequest) (*CreateSubjectResponse, error)
 	UpdateSubject(context.Context, *UpdateSubjectRequest) (*UpdateSubjectResponse, error)
-	DeleteSubject(context.Context, *UpdateSubjectRequest) (*UpdateSubjectResponse, error)
+	DeleteSubject(context.Context, *DeleteSubjectRequest) (*DeleteSubjectResponse, error)
 	PaginatePostBySubject(context.Context, *PaginatePostBySubjectRequest) (*PaginatePostBySubjectResponse, error)
 	PaginateFileBySubject(context.Context, *PaginateFileBySubjectRequest) (*PaginateFileBySubjectResponse, error)
 	mustEmbedUnimplementedSubjectServiceServer()
@@ -123,8 +123,8 @@ type UnimplementedSubjectServiceServer struct {
 func (UnimplementedSubjectServiceServer) PaginateSubjects(context.Context, *PaginateSubjectRequest) (*PaginateSubjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PaginateSubjects not implemented")
 }
-func (UnimplementedSubjectServiceServer) GetSubjectBySubjectId(context.Context, *GetSubjectByIdRequest) (*GetSubjectByIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSubjectBySubjectId not implemented")
+func (UnimplementedSubjectServiceServer) GetSubjectById(context.Context, *GetSubjectByIdRequest) (*GetSubjectByIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubjectById not implemented")
 }
 func (UnimplementedSubjectServiceServer) CreateSubject(context.Context, *CreateSubjectRequest) (*CreateSubjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSubject not implemented")
@@ -132,7 +132,7 @@ func (UnimplementedSubjectServiceServer) CreateSubject(context.Context, *CreateS
 func (UnimplementedSubjectServiceServer) UpdateSubject(context.Context, *UpdateSubjectRequest) (*UpdateSubjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSubject not implemented")
 }
-func (UnimplementedSubjectServiceServer) DeleteSubject(context.Context, *UpdateSubjectRequest) (*UpdateSubjectResponse, error) {
+func (UnimplementedSubjectServiceServer) DeleteSubject(context.Context, *DeleteSubjectRequest) (*DeleteSubjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSubject not implemented")
 }
 func (UnimplementedSubjectServiceServer) PaginatePostBySubject(context.Context, *PaginatePostBySubjectRequest) (*PaginatePostBySubjectResponse, error) {
@@ -172,20 +172,20 @@ func _SubjectService_PaginateSubjects_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SubjectService_GetSubjectBySubjectId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SubjectService_GetSubjectById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetSubjectByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SubjectServiceServer).GetSubjectBySubjectId(ctx, in)
+		return srv.(SubjectServiceServer).GetSubjectById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SubjectService/GetSubjectBySubjectId",
+		FullMethod: "/SubjectService/GetSubjectById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SubjectServiceServer).GetSubjectBySubjectId(ctx, req.(*GetSubjectByIdRequest))
+		return srv.(SubjectServiceServer).GetSubjectById(ctx, req.(*GetSubjectByIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -227,7 +227,7 @@ func _SubjectService_UpdateSubject_Handler(srv interface{}, ctx context.Context,
 }
 
 func _SubjectService_DeleteSubject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateSubjectRequest)
+	in := new(DeleteSubjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func _SubjectService_DeleteSubject_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/SubjectService/DeleteSubject",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SubjectServiceServer).DeleteSubject(ctx, req.(*UpdateSubjectRequest))
+		return srv.(SubjectServiceServer).DeleteSubject(ctx, req.(*DeleteSubjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -292,8 +292,8 @@ var SubjectService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SubjectService_PaginateSubjects_Handler,
 		},
 		{
-			MethodName: "GetSubjectBySubjectId",
-			Handler:    _SubjectService_GetSubjectBySubjectId_Handler,
+			MethodName: "GetSubjectById",
+			Handler:    _SubjectService_GetSubjectById_Handler,
 		},
 		{
 			MethodName: "CreateSubject",

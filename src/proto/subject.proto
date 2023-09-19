@@ -6,10 +6,10 @@ import "entity.proto";
 
 service SubjectService {
 	rpc PaginateSubjects(PaginateSubjectRequest) returns (PaginateSubjectResponse);
-	rpc GetSubjectBySubjectId(GetSubjectByIdRequest) returns (GetSubjectByIdResponse);
+	rpc GetSubjectById(GetSubjectByIdRequest) returns (GetSubjectByIdResponse);
 	rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
 	rpc UpdateSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
-	rpc DeleteSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
+	rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse);
 	rpc PaginatePostBySubject(PaginatePostBySubjectRequest) returns (PaginatePostBySubjectResponse);
 	rpc PaginateFileBySubject(PaginateFileBySubjectRequest) returns (PaginateFileBySubjectResponse);
 }
@@ -33,7 +33,7 @@ message PaginateSubjectResponse {
 }
 
 message GetSubjectByIdRequest {
-	string id = 1;
+	int64 id = 1;
 }
 
 message GetSubjectByIdResponse {
