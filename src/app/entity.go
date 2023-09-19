@@ -24,6 +24,7 @@ type Subject struct {
 	SubjectId     string
 	Name          string
 	Semester      int64
+	Section       int64
 	Year          int64
 	Faculty       string
 	Description   string
