@@ -6,10 +6,10 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY ./src/*.go ./
+COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /subject-service
+RUN CGO_ENABLED=0 GOOS=linux go build -o subject-service ./src/.
 
-EXPOSE 8081
+EXPOSE 8080
 
-CMD ["/subject-service"]
+CMD ["./subject-service"]

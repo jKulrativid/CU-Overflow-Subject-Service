@@ -4,6 +4,8 @@ services:
   subject-service:
     container_name: subject_service
     build: .
+    ports:
+      - 8080:8080
     networks:
       - subject
   
