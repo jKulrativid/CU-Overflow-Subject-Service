@@ -41,6 +41,8 @@ message CreateInstructorRequest {
 	string phone_number = 5;
 	string website = 6;
 	string degree = 7;
+
+	bool is_admin = 99;
 }
 
 message CreateInstructorResponse {
@@ -54,6 +56,8 @@ message UpdateInstructorRequest {
 	string phone_number = 5;
 	string website = 6;
 	string degree = 7;
+
+	bool is_admin = 99;
 }
 
 message UpdateInstructorResponse {
@@ -62,6 +66,8 @@ message UpdateInstructorResponse {
 
 message DeleteInstructorRequest {
 	int64 id = 1;
+
+	bool is_admin = 99;
 }
 
 message DeleteInstructorResponse {
