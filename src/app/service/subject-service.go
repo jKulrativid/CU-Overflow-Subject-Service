@@ -3,17 +3,17 @@ package service
 import (
 	"context"
 
+	"github.com/jKulrativid/SA-Subject-Service/src/app/repository"
 	pb "github.com/jKulrativid/SA-Subject-Service/src/grpc/subject"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type SubjectService struct {
 	pb.UnimplementedSubjectServiceServer
+	subjectRepo repository.SubjectRepository
 }
 
-func NewSubjectService() *SubjectService {
-	return &SubjectService{}
+func NewSubjectService(subjectRepo repository.SubjectRepository) *SubjectService {
+	return &SubjectService{subjectRepo: subjectRepo}
 }
 
 func (s *SubjectService) PaginateSubjects(ctx context.Context, req *pb.PaginateSubjectRequest) (*pb.PaginateSubjectResponse, error) {
@@ -39,9 +39,6 @@ func (s *SubjectService) PaginateSubjects(ctx context.Context, req *pb.PaginateS
 }
 
 func (s *SubjectService) GetSubjectById(ctx context.Context, req *pb.GetSubjectByIdRequest) (*pb.GetSubjectByIdResponse, error) {
-	if req.Id < 0 || req.Id > 2 {
-		return nil, status.Error(codes.NotFound, "subject with given ID not found")
-	}
 
 	id := req.Id
 

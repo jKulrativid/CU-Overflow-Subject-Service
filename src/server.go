@@ -6,12 +6,27 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/jKulrativid/SA-Subject-Service/src/app/service"
+	"github.com/jKulrativid/SA-Subject-Service/src/repository"
+
+	"github.com/jKulrativid/SA-Subject-Service/src/database"
 	pb "github.com/jKulrativid/SA-Subject-Service/src/grpc/subject"
 )
 
 func main() {
-	subjectService := service.NewSubjectService()
-	instructorService := service.NewInstructorService()
+	dbConn, err := database.NewDatabaseConnection()
+	if err != nil {
+		panic(err)
+	}
+
+	if err := database.Migrate(dbConn); err != nil {
+		panic(err)
+	}
+
+	subjectRepo := repository.NewSubjectRepository(dbConn)
+	instructorRepo := repository.NewInstructorRepository(dbConn)
+
+	subjectService := service.NewSubjectService(subjectRepo)
+	instructorService := service.NewInstructorService(instructorRepo)
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterSubjectServiceServer(grpcServer, subjectService)

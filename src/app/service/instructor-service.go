@@ -3,15 +3,17 @@ package service
 import (
 	"context"
 
+	"github.com/jKulrativid/SA-Subject-Service/src/app/repository"
 	pb "github.com/jKulrativid/SA-Subject-Service/src/grpc/subject"
 )
 
 type InstructorService struct {
 	pb.UnimplementedInstructorServiceServer
+	instructorRepo repository.InstructorRepository
 }
 
-func NewInstructorService() *InstructorService {
-	return &InstructorService{}
+func NewInstructorService(instructorRepo repository.InstructorRepository) *InstructorService {
+	return &InstructorService{instructorRepo: instructorRepo}
 }
 
 func (s *InstructorService) PaginateInstructors(ctx context.Context, req *pb.PaginateInstructorRequest) (*pb.PaginateInstructorResponse, error) {

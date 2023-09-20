@@ -5,7 +5,7 @@ import "github.com/jKulrativid/SA-Subject-Service/src/app/entity"
 type InstructorRepository interface {
 }
 
-type SubjectService interface {
+type SubjectRepository interface {
 	PaginateSubjects(query map[string]interface{}) (*entity.PaginationMetadata, []*entity.Subject, error)
 	FindSubjectById(id int64) (*entity.Subject, error)
 	CreateSubject(subject *entity.Subject) error
