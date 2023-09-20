@@ -1,4 +1,4 @@
-package service
+package entity
 
 type Post struct {
 	Id int64
