@@ -8,7 +8,7 @@ type InstructorRepository interface {
 type SubjectService interface {
 	PaginateSubjects(query map[string]interface{}) (*entity.PaginationMetadata, []*entity.Subject, error)
 	FindSubjectById(id int64) (*entity.Subject, error)
-	SaveSubject(subject *entity.Subject) error
+	CreateSubject(subject *entity.Subject) error
 	UpdateSubject(subject *entity.Subject) error
 	DeleteSubjectById(id int64) error
 }
