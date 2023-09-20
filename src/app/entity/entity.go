@@ -33,3 +33,10 @@ type Subject struct {
 	Posts         []Post
 	Files         []File
 }
+
+type PaginationMetadata struct {
+	Page       int64
+	PerPage    int64
+	PageCount  int64
+	TotalCount int64
+}
