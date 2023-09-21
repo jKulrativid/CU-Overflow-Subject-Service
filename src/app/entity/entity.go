@@ -34,6 +34,20 @@ type Subject struct {
 	Files         []File
 }
 
+type SubjectMetadata struct {
+	Id        int64
+	SubjectId string
+	Name      string
+	Semester  int64
+	Section   int64
+	Year      int64
+}
+
+type InstructorMetadata struct {
+	Id       int64
+	FullName string
+}
+
 type PaginationMetadata struct {
 	Page       int64
 	PerPage    int64
