@@ -22,8 +22,8 @@ func main() {
 		panic(err)
 	}
 
-	subjectRepo := repository.NewSubjectRepository(dbConn)
-	instructorRepo := repository.NewInstructorRepository(dbConn)
+	subjectRepo := repository.NewSubjectRepository(dbConn, 10)
+	instructorRepo := repository.NewInstructorRepository(dbConn, 10)
 
 	subjectService := service.NewSubjectService(subjectRepo)
 	instructorService := service.NewInstructorService(instructorRepo)
