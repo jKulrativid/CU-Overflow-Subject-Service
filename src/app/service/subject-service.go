@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jKulrativid/SA-Subject-Service/src/app/entity"
 	"github.com/jKulrativid/SA-Subject-Service/src/app/repository"
@@ -135,7 +136,7 @@ func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjec
 	}
 
 	prerequisites := make([]entity.Subject, 0)
-	for _, prerequisiteId := range req.PrerequisitedIds {
+	for _, prerequisiteId := range req.PrerequisiteIds {
 		prerequisites = append(prerequisites, entity.Subject{Id: prerequisiteId})
 	}
 
@@ -157,9 +158,10 @@ func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjec
 	}
 
 	if err := s.subjectRepo.CreateSubject(&subject); err != nil {
+		fmt.Println(err)
 		switch err {
 		case entity.ErrConstraintViolation:
-			return nil, status.Error(codes.NotFound, "not found")
+			return nil, status.Error(codes.InvalidArgument, "bad request")
 		default:
 			return nil, status.Error(codes.Internal, "internal server error")
 		}

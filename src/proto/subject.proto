@@ -48,7 +48,7 @@ message CreateSubjectRequest {
 	int64 year = 5;
 	string faculty = 6;
 	string description = 7;
-	repeated int64 prerequisited_ids = 8;
+	repeated int64 prerequisite_ids = 8;
 	repeated int64 instructor_ids = 9;
 
 	bool is_admin = 99;
