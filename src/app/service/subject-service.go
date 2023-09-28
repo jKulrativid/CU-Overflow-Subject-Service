@@ -20,6 +20,38 @@ func NewSubjectService(subjectRepo repository.SubjectRepository) *SubjectService
 	return &SubjectService{subjectRepo: subjectRepo}
 }
 
+func SubjectToPb(subject *entity.Subject) *pb.Subject {
+	prerequisitesResp := make([]*pb.Subject, 0)
+	for _, prerequisite := range subject.Prerequisites {
+		prerequisitesResp = append(prerequisitesResp, &pb.Subject{
+			Id:        prerequisite.Id,
+			SubjectId: prerequisite.SubjectId,
+			Name:      prerequisite.Name,
+		})
+	}
+
+	instructorResp := make([]*pb.Instructor, 0)
+	for _, instructor := range subject.Instructors {
+		instructorResp = append(instructorResp, &pb.Instructor{
+			Id:       instructor.Id,
+			FullName: instructor.FullName,
+		})
+	}
+
+	return &pb.Subject{
+		Id:            subject.Id,
+		SubjectId:     subject.SubjectId,
+		Name:          subject.Name,
+		Semester:      subject.Semester,
+		Section:       subject.Section,
+		Year:          subject.Year,
+		Faculty:       subject.Faculty,
+		Description:   subject.Description,
+		Prerequisites: prerequisitesResp,
+		Instructors:   instructorResp,
+	}
+}
+
 func (s *SubjectService) PaginateSubjects(ctx context.Context, req *pb.PaginateSubjectRequest) (*pb.PaginateSubjectResponse, error) {
 	if req.PageNumber < 1 {
 		return nil, status.Error(codes.InvalidArgument, "page number must be a positive integer")
@@ -99,20 +131,7 @@ func (s *SubjectService) GetSubjectById(ctx context.Context, req *pb.GetSubjectB
 		})
 	}
 
-	return &pb.GetSubjectByIdResponse{
-		Subject: &pb.Subject{
-			Id:            subject.Id,
-			SubjectId:     subject.SubjectId,
-			Name:          subject.Name,
-			Semester:      subject.Semester,
-			Section:       subject.Section,
-			Year:          subject.Year,
-			Faculty:       subject.Faculty,
-			Description:   subject.Description,
-			Prerequisites: prerequisitesResp,
-			Instructors:   instructorResp,
-		},
-	}, nil
+	return &pb.GetSubjectByIdResponse{Subject: SubjectToPb(subject)}, nil
 }
 
 func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjectRequest) (*pb.CreateSubjectResponse, error) {
@@ -167,43 +186,70 @@ func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjec
 		}
 	}
 
-	prerequisitesResp := make([]*pb.Subject, 0)
-	for _, prerequisite := range subject.Prerequisites {
-		prerequisitesResp = append(prerequisitesResp, &pb.Subject{
-			Id:        prerequisite.Id,
-			SubjectId: prerequisite.SubjectId,
-			Name:      prerequisite.Name,
-		})
-	}
-
-	instructorResp := make([]*pb.Instructor, 0)
-	for _, instructor := range subject.Instructors {
-		instructorResp = append(instructorResp, &pb.Instructor{
-			Id:       instructor.Id,
-			FullName: instructor.FullName,
-		})
-	}
-
-	return &pb.CreateSubjectResponse{
-		Subject: &pb.Subject{
-			Id:            subject.Id,
-			SubjectId:     subject.SubjectId,
-			Name:          subject.Name,
-			Semester:      subject.Semester,
-			Section:       subject.Section,
-			Year:          subject.Year,
-			Faculty:       subject.Faculty,
-			Description:   subject.Description,
-			Prerequisites: prerequisitesResp,
-			Instructors:   instructorResp,
-		},
-	}, nil
+	return &pb.CreateSubjectResponse{Subject: SubjectToPb(&subject)}, nil
 }
 
 func (s *SubjectService) UpdateSubject(ctx context.Context, req *pb.UpdateSubjectRequest) (*pb.UpdateSubjectResponse, error) {
-	return nil, nil
+	if req.Semester != 0 && (req.Semester < 1 || req.Semester > 3) {
+		return nil, status.Error(codes.InvalidArgument, "subject semester should be 1,2 or 3")
+	}
+	if req.Section != 0 && (req.Section < 1 || req.Section > 100) {
+		return nil, status.Error(codes.InvalidArgument, "subject section should be between 1 and 100")
+	}
+	if req.Year != 0 && (req.Year < 2000) {
+		return nil, status.Error(codes.InvalidArgument, "subject year must be after 1999")
+	}
+
+	prerequisites := make([]entity.Subject, 0)
+	for _, prerequisiteId := range req.PrerequisitedIds {
+		prerequisites = append(prerequisites, entity.Subject{Id: prerequisiteId})
+	}
+
+	instructors := make([]entity.Instructor, 0)
+	for _, instructorId := range req.InstructorIds {
+		instructors = append(instructors, entity.Instructor{Id: instructorId})
+	}
+
+	subject := entity.Subject{
+		Id:            req.Id,
+		SubjectId:     req.SubjectId,
+		Name:          req.Name,
+		Semester:      req.Semester,
+		Section:       req.Section,
+		Year:          req.Year,
+		Faculty:       req.Faculty,
+		Description:   req.Description,
+		Prerequisites: prerequisites,
+		Instructors:   instructors,
+	}
+
+	err := s.subjectRepo.UpdateSubject(&subject)
+	if err != nil {
+		switch err {
+		case entity.ErrConstraintViolation:
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
+	return &pb.UpdateSubjectResponse{Subject: SubjectToPb(&subject)}, nil
 }
 
 func (s *SubjectService) DeleteSubject(ctx context.Context, req *pb.DeleteSubjectRequest) (*pb.DeleteSubjectResponse, error) {
-	return nil, nil
+	if req.Id < 0 {
+		return nil, status.Error(codes.InvalidArgument, "invalid ID")
+	}
+
+	subject, err := s.subjectRepo.DeleteSubjectById(req.Id)
+	if err != nil {
+		switch err {
+		case entity.ErrNotFound:
+			return nil, status.Error(codes.NotFound, "subject with given ID not found")
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
+	return &pb.DeleteSubjectResponse{Subject: SubjectToPb(subject)}, nil
 }

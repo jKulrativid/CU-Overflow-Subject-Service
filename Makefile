@@ -3,3 +3,6 @@ compile_proto:
 
 compose_all:
 	docker compose up --build -d
+
+compose_subject_service:
+	docker compose up --build -d subject-service

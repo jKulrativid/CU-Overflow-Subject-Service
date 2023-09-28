@@ -133,6 +133,6 @@ func (r *SubjectRepository) UpdateSubject(subject *entity.Subject) error {
 	return nil
 }
 
-func (r *SubjectRepository) DeleteSubjectById(id int64) error {
-	return nil
+func (r *SubjectRepository) DeleteSubjectById(id int64) (*entity.Subject, error) {
+	return nil, nil
 }
