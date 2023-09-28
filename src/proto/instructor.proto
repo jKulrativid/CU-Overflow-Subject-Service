@@ -50,6 +50,7 @@ message CreateInstructorResponse {
 }
 
 message UpdateInstructorRequest {
+	int64 id = 1;
 	string full_name = 2;
 	string faculty = 3;
 	string email = 4;
