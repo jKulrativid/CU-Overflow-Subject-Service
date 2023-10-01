@@ -21,34 +21,20 @@ func NewSubjectService(subjectRepo repository.SubjectRepository) *SubjectService
 }
 
 func SubjectToPb(subject *entity.Subject) *pb.Subject {
-	prerequisitesResp := make([]*pb.Subject, 0)
-	for _, prerequisite := range subject.Prerequisites {
-		prerequisitesResp = append(prerequisitesResp, &pb.Subject{
-			Id:        prerequisite.Id,
-			SubjectId: prerequisite.SubjectId,
-			Name:      prerequisite.Name,
-		})
-	}
-
-	instructorResp := make([]*pb.Instructor, 0)
-	for _, instructor := range subject.Instructors {
-		instructorResp = append(instructorResp, &pb.Instructor{
-			Id:       instructor.Id,
-			FullName: instructor.FullName,
-		})
+	sectionIds := make([]int64, 0)
+	for _, section := range subject.Sections {
+		sectionIds = append(sectionIds, section.Id)
 	}
 
 	return &pb.Subject{
-		Id:            subject.Id,
-		SubjectId:     subject.SubjectId,
-		Name:          subject.Name,
-		Semester:      subject.Semester,
-		Section:       subject.Section,
-		Year:          subject.Year,
-		Faculty:       subject.Faculty,
-		Description:   subject.Description,
-		Prerequisites: prerequisitesResp,
-		Instructors:   instructorResp,
+		Id:          subject.Id,
+		SubjectId:   subject.SubjectId,
+		Name:        subject.Name,
+		Semester:    subject.Semester,
+		SectionIds:  sectionIds,
+		Year:        subject.Year,
+		Faculty:     subject.Faculty,
+		Description: subject.Description,
 	}
 }
 
@@ -68,12 +54,12 @@ func (s *SubjectService) PaginateSubjects(ctx context.Context, req *pb.PaginateS
 	if len(req.SemesterWhitelist) != 0 {
 		query["semester_whitelist"] = req.SemesterWhitelist
 	}
-	if len(req.SectionWhitelist) != 0 {
-		query["section_whitelist"] = req.SectionWhitelist
-	}
 	if req.YearRangeStart != 0 && req.YearRangeStop != 0 {
-		query["year_range_start"] = req.YearRangeStart
-		query["year_range_stop"] = req.YearRangeStop
+		isValidYearRange := req.YearRangeStart <= req.YearRangeStop
+		if isValidYearRange {
+			query["year_range_start"] = req.YearRangeStart
+			query["year_range_stop"] = req.YearRangeStop
+		}
 	}
 
 	metadata, subjects, err := s.subjectRepo.PaginateSubjects(req.PageNumber, query)
@@ -86,18 +72,17 @@ func (s *SubjectService) PaginateSubjects(ctx context.Context, req *pb.PaginateS
 		PerPage:    metadata.PerPage,
 		PageCount:  metadata.PageCount,
 		TotalCount: metadata.TotalCount,
-		Subjects:   make([]*pb.SubjectMetadata, len(subjects)),
+		Subjects:   make([]*pb.SubjectMetadata, 0),
 	}
 
-	for i, subject := range subjects {
-		resp.Subjects[i] = &pb.SubjectMetadata{
+	for _, subject := range subjects {
+		resp.Subjects = append(resp.Subjects, &pb.SubjectMetadata{
 			Id:        subject.Id,
 			Name:      subject.Name,
 			SubjectId: subject.SubjectId,
 			Semester:  subject.Semester,
-			Section:   subject.Section,
 			Year:      subject.Year,
-		}
+		})
 	}
 
 	return &resp, nil
@@ -114,23 +99,6 @@ func (s *SubjectService) GetSubjectById(ctx context.Context, req *pb.GetSubjectB
 		}
 	}
 
-	prerequisitesResp := make([]*pb.Subject, 0)
-	for _, prerequisite := range subject.Prerequisites {
-		prerequisitesResp = append(prerequisitesResp, &pb.Subject{
-			Id:        prerequisite.Id,
-			SubjectId: prerequisite.SubjectId,
-			Name:      prerequisite.Name,
-		})
-	}
-
-	instructorResp := make([]*pb.Instructor, 0)
-	for _, instructor := range subject.Instructors {
-		instructorResp = append(instructorResp, &pb.Instructor{
-			Id:       instructor.Id,
-			FullName: instructor.FullName,
-		})
-	}
-
 	return &pb.GetSubjectByIdResponse{Subject: SubjectToPb(subject)}, nil
 }
 
@@ -144,9 +112,6 @@ func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjec
 	if req.Semester < 1 || req.Semester > 3 {
 		return nil, status.Error(codes.InvalidArgument, "subject semester should be 1,2 or 3")
 	}
-	if req.Section < 1 || req.Section > 100 {
-		return nil, status.Error(codes.InvalidArgument, "subject section should be between 1 and 100")
-	}
 	if req.Year < 2000 {
 		return nil, status.Error(codes.InvalidArgument, "subject year must be after 1999")
 	}
@@ -154,26 +119,13 @@ func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjec
 		return nil, status.Error(codes.InvalidArgument, "subject faculty not provided")
 	}
 
-	prerequisites := make([]entity.Subject, 0)
-	for _, prerequisiteId := range req.PrerequisiteIds {
-		prerequisites = append(prerequisites, entity.Subject{Id: prerequisiteId})
-	}
-
-	instructors := make([]entity.Instructor, 0)
-	for _, instructorId := range req.InstructorIds {
-		instructors = append(instructors, entity.Instructor{Id: instructorId})
-	}
-
 	subject := entity.Subject{
-		SubjectId:     req.SubjectId,
-		Name:          req.Name,
-		Semester:      req.Semester,
-		Section:       req.Section,
-		Year:          req.Year,
-		Faculty:       req.Faculty,
-		Description:   req.Description,
-		Prerequisites: prerequisites,
-		Instructors:   instructors,
+		SubjectId:   req.SubjectId,
+		Name:        req.Name,
+		Semester:    req.Semester,
+		Year:        req.Year,
+		Faculty:     req.Faculty,
+		Description: req.Description,
 	}
 
 	if err := s.subjectRepo.CreateSubject(&subject); err != nil {
@@ -193,34 +145,18 @@ func (s *SubjectService) UpdateSubject(ctx context.Context, req *pb.UpdateSubjec
 	if req.Semester != 0 && (req.Semester < 1 || req.Semester > 3) {
 		return nil, status.Error(codes.InvalidArgument, "subject semester should be 1,2 or 3")
 	}
-	if req.Section != 0 && (req.Section < 1 || req.Section > 100) {
-		return nil, status.Error(codes.InvalidArgument, "subject section should be between 1 and 100")
-	}
 	if req.Year != 0 && (req.Year < 2000) {
 		return nil, status.Error(codes.InvalidArgument, "subject year must be after 1999")
 	}
 
-	prerequisites := make([]entity.Subject, 0)
-	for _, prerequisiteId := range req.PrerequisitedIds {
-		prerequisites = append(prerequisites, entity.Subject{Id: prerequisiteId})
-	}
-
-	instructors := make([]entity.Instructor, 0)
-	for _, instructorId := range req.InstructorIds {
-		instructors = append(instructors, entity.Instructor{Id: instructorId})
-	}
-
 	subject := entity.Subject{
-		Id:            req.Id,
-		SubjectId:     req.SubjectId,
-		Name:          req.Name,
-		Semester:      req.Semester,
-		Section:       req.Section,
-		Year:          req.Year,
-		Faculty:       req.Faculty,
-		Description:   req.Description,
-		Prerequisites: prerequisites,
-		Instructors:   instructors,
+		Id:          req.Id,
+		SubjectId:   req.SubjectId,
+		Name:        req.Name,
+		Semester:    req.Semester,
+		Year:        req.Year,
+		Faculty:     req.Faculty,
+		Description: req.Description,
 	}
 
 	err := s.subjectRepo.UpdateSubject(&subject)

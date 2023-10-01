@@ -21,7 +21,6 @@ func (r *SubjectRepository) PaginateSubjects(pageNumber int64, query map[string]
 	subjectId, hasSubjectId := query["subject_id"].(string)
 	name, hasName := query["name"].(string)
 	semesterWhitelist, hasSemesterWhitelist := query["semester_whitelist"].([]int64)
-	sectionWhitelist, hasSectionWhitelist := query["section_whitelist"].([]int64)
 	yearRangeStart, hasYearRangeStart := query["year_range_start"].(int64)
 	yearRangeStop, hasYearRangeStop := query["year_range_stop"].(int64)
 
@@ -41,9 +40,6 @@ func (r *SubjectRepository) PaginateSubjects(pageNumber int64, query map[string]
 		}
 		if hasSemesterWhitelist {
 			tx = tx.Where("semester IN ?", semesterWhitelist)
-		}
-		if hasSectionWhitelist {
-			tx = tx.Where("section IN ?", sectionWhitelist)
 		}
 		if hasYearRangeStart && hasYearRangeStop {
 			tx = tx.Where("year >= ? AND year <= ?", yearRangeStart, yearRangeStop)
@@ -83,7 +79,7 @@ func (r *SubjectRepository) FindSubjectById(id int64) (*entity.Subject, error) {
 	var subjectRecord SubjectSchema
 
 	txErr := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Preload("Prerequisites").Preload("Instructors").First(&subjectRecord, id).Error; err != nil {
+		if err := tx.Preload("Sections").First(&subjectRecord, id).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return entity.ErrNotFound
 			}
@@ -104,16 +100,10 @@ func (r *SubjectRepository) CreateSubject(subject *entity.Subject) error {
 	subjectRecord := NewSubjectSchema(subject)
 
 	txErr := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Omit("Prerequisites.*", "Instructors.*").Create(subjectRecord).Error; err != nil {
+		if err := tx.Omit("Sections.*").Create(subjectRecord).Error; err != nil {
 			if errors.Is(err, gorm.ErrDuplicatedKey) {
 				return entity.ErrConstraintViolation
 			}
-			return err
-		}
-
-		tx = tx.Session(&gorm.Session{}).Model(&SubjectSchema{})
-		if err := tx.Preload("Prerequisites").Preload("Instructors").First(&subjectRecord, subjectRecord.ID).Error; err != nil {
-			tx.Rollback()
 			return err
 		}
 

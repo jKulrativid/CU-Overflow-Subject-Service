@@ -18,5 +18,5 @@ func NewDatabaseConnection() (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&repository.SubjectSchema{}, &repository.InstructorSchema{})
+	return db.AutoMigrate(&repository.SubjectSchema{}, &repository.SectionSchema{}, &repository.InstructorSchema{})
 }

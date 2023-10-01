@@ -2,17 +2,23 @@ syntax = "proto3";
 
 option go_package = "./subject";
 
+message Section {
+	int64 id = 1;
+	int64 number = 2;
+	string description = 3;
+	int64 instructor_ids = 4;
+}
+
 message Subject {
 	int64 id = 1;
 	string subject_id = 2;
 	string name = 3;
 	int64 semester = 4;
-	int64 section = 5;
+	repeated int64 section_ids = 5;
 	int64 year = 6;
 	string faculty = 7;
 	string description = 8;
-	repeated Subject prerequisites = 9;
-	repeated Instructor instructors = 10;
+	repeated string prerequisites = 9;
 }
 
 message SubjectMetadata {
@@ -32,7 +38,7 @@ message Instructor {
 	string phone_number = 5;
 	string website = 6;
 	string degree = 7;
-	repeated Subject taught_subjects = 8;
+	repeated int64 taught_subject_ids = 8;
 }
 
 message InstructorMetadata {

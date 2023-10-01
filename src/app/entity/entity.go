@@ -9,14 +9,22 @@ type File struct {
 }
 
 type Instructor struct {
-	Id             int64
-	FullName       string
-	Faculty        string
-	Email          string
-	PhoneNumber    string
-	Website        string
-	Degree         string
-	TaughtSubjects []Subject
+	Id            int64
+	FullName      string
+	Faculty       string
+	Email         string
+	PhoneNumber   string
+	Website       string
+	Degree        string
+	TaughtSection []Section
+}
+
+type Section struct {
+	Id          int64
+	Number      int64
+	Description string
+	Instructors []Instructor
+	Files       []File
 }
 
 type Subject struct {
@@ -24,14 +32,12 @@ type Subject struct {
 	SubjectId     string
 	Name          string
 	Semester      int64
-	Section       int64
 	Year          int64
-	Faculty       string
+	Sections      []Section
 	Description   string
-	Prerequisites []Subject
-	Instructors   []Instructor
+	Prerequisites []string
+	Faculty       string
 	Posts         []Post
-	Files         []File
 }
 
 type SubjectMetadata struct {
@@ -39,7 +45,6 @@ type SubjectMetadata struct {
 	SubjectId string
 	Name      string
 	Semester  int64
-	Section   int64
 	Year      int64
 }
 

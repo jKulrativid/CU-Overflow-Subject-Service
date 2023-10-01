@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/jKulrativid/SA-Subject-Service/src/app/entity"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -13,13 +14,13 @@ type InstructorSchema struct {
 	PhoneNumber    string          `gorm:"type:varchar(30)"`
 	Website        string          `gorm:"type:varchar(255)"`
 	Degree         string          `gorm:"type:text"`
-	TaughtSubjects []SubjectSchema `gorm:"many2many:subject_instructors"`
+	TaughtSections []SectionSchema `gorm:"many2many:subject_instructors"`
 }
 
 func NewInstructorSchema(instructor *entity.Instructor) *InstructorSchema {
-	taughtSubjectSchemas := make([]SubjectSchema, 0)
-	for _, taughtSubject := range instructor.TaughtSubjects {
-		taughtSubjectSchemas = append(taughtSubjectSchemas, *NewSubjectSchema(&taughtSubject))
+	taughtSectionSchemas := make([]SectionSchema, 0)
+	for _, taughtSubject := range instructor.TaughtSection {
+		taughtSectionSchemas = append(taughtSectionSchemas, *NewSectionSchema(&taughtSubject))
 	}
 
 	return &InstructorSchema{
@@ -30,25 +31,25 @@ func NewInstructorSchema(instructor *entity.Instructor) *InstructorSchema {
 		PhoneNumber:    instructor.PhoneNumber,
 		Website:        instructor.Website,
 		Degree:         instructor.Degree,
-		TaughtSubjects: taughtSubjectSchemas,
+		TaughtSections: taughtSectionSchemas,
 	}
 }
 
 func (schema *InstructorSchema) ToInstructor() *entity.Instructor {
-	taughtSubjects := make([]entity.Subject, 0)
-	for _, taughtSubjectSchema := range schema.TaughtSubjects {
-		taughtSubjects = append(taughtSubjects, *taughtSubjectSchema.ToSubject())
+	taughtSection := make([]entity.Section, 0)
+	for _, taughtSectionSchema := range schema.TaughtSections {
+		taughtSection = append(taughtSection, *taughtSectionSchema.ToSection())
 	}
 
 	return &entity.Instructor{
-		Id:             int64(schema.ID),
-		FullName:       schema.FullName,
-		Faculty:        schema.Faculty,
-		Email:          schema.Email,
-		PhoneNumber:    schema.PhoneNumber,
-		Website:        schema.Website,
-		Degree:         schema.Degree,
-		TaughtSubjects: taughtSubjects,
+		Id:            int64(schema.ID),
+		FullName:      schema.FullName,
+		Faculty:       schema.Faculty,
+		Email:         schema.Email,
+		PhoneNumber:   schema.PhoneNumber,
+		Website:       schema.Website,
+		Degree:        schema.Degree,
+		TaughtSection: taughtSection,
 	}
 }
 
@@ -56,28 +57,61 @@ func (InstructorSchema) TableName() string {
 	return "instructors"
 }
 
+type SectionSchema struct {
+	gorm.Model
+	SubjectId   uint
+	Number      int64              `gorm:"not null"`
+	Description string             `gorm:"type:text"`
+	Instructors []InstructorSchema `gorm:"many2many:section_instructors"`
+}
+
+func NewSectionSchema(section *entity.Section) *SectionSchema {
+	instructorSchemas := make([]InstructorSchema, 0)
+	for _, instructor := range section.Instructors {
+		instructorSchemas = append(instructorSchemas, *NewInstructorSchema(&instructor))
+	}
+
+	return &SectionSchema{
+		Model:       gorm.Model{ID: uint(section.Id)},
+		Number:      section.Number,
+		Description: section.Description,
+		Instructors: instructorSchemas,
+	}
+}
+
+func (schema *SectionSchema) ToSection() *entity.Section {
+	instructors := make([]entity.Instructor, 0)
+	for _, instructorSchema := range schema.Instructors {
+		instructors = append(instructors, *instructorSchema.ToInstructor())
+	}
+	return &entity.Section{
+		Id:          int64(schema.ID),
+		Number:      schema.Number,
+		Description: schema.Description,
+		Instructors: instructors,
+	}
+}
+
+func (*SectionSchema) TableName() string {
+	return "sections"
+}
+
 type SubjectSchema struct {
 	gorm.Model
 	SubjectId     string
-	Name          string             `gorm:"type:varchar(255);index:ix_subject_name;index:ux_subject_name_semester_section_year_constraint,unique"`
-	Semester      int64              `gorm:"index:ix_subject_semester;index:ux_subject_name_semester_section_year_constraint,unique"`
-	Section       int64              `gorm:"index:ix_subject_section;index:ux_subject_name_semester_section_year_constraint,unique"`
-	Year          int64              `gorm:"index:ix_subject_year;index:ux_subject_name_semester_section_year_constraint,unique"`
-	Faculty       string             `gorm:"type:varchar(255)"`
-	Description   string             `gorm:"type:text"`
-	Prerequisites []SubjectSchema    `gorm:"many2many:subject_prerequisites"`
-	Instructors   []InstructorSchema `gorm:"many2many:subject_instructors"`
+	Name          string          `gorm:"not null;type:varchar(255);index:ix_subject_name;index:ux_subject_name_semester_year_constraint,unique"`
+	Semester      int64           `gorm:"not null;index:ix_subject_semester;index:ux_subject_name_semester_year_constraint,unique"`
+	Sections      []SectionSchema `gorm:"foreignKey:SubjectId"`
+	Year          int64           `gorm:"not null;index:ix_subject_year;index:ux_subject_name_semester_year_constraint,unique"`
+	Faculty       string          `gorm:"type:varchar(255)"`
+	Description   string          `gorm:"type:text"`
+	Prerequisites pq.StringArray  `gorm:"type:varchar(64)[]"`
 }
 
 func NewSubjectSchema(subject *entity.Subject) *SubjectSchema {
-	prerequisiteSchemas := make([]SubjectSchema, 0)
-	for _, prerequisite := range subject.Prerequisites {
-		prerequisiteSchemas = append(prerequisiteSchemas, *NewSubjectSchema(&prerequisite))
-	}
-
-	instructorSchemas := make([]InstructorSchema, 0)
-	for _, instructor := range subject.Instructors {
-		instructorSchemas = append(instructorSchemas, *NewInstructorSchema(&instructor))
+	sectionSchemas := make([]SectionSchema, 0)
+	for _, section := range subject.Sections {
+		sectionSchemas = append(sectionSchemas, *NewSectionSchema(&section))
 	}
 
 	return &SubjectSchema{
@@ -85,24 +119,18 @@ func NewSubjectSchema(subject *entity.Subject) *SubjectSchema {
 		SubjectId:     subject.SubjectId,
 		Name:          subject.Name,
 		Semester:      subject.Semester,
-		Section:       subject.Section,
+		Sections:      sectionSchemas,
 		Year:          subject.Year,
 		Faculty:       subject.Faculty,
 		Description:   subject.Description,
-		Prerequisites: prerequisiteSchemas,
-		Instructors:   instructorSchemas,
+		Prerequisites: subject.Prerequisites,
 	}
 }
 
 func (schema *SubjectSchema) ToSubject() *entity.Subject {
-	prerequisites := make([]entity.Subject, 0)
-	for _, prerequisiteRecord := range schema.Prerequisites {
-		prerequisites = append(prerequisites, *prerequisiteRecord.ToSubject())
-	}
-
-	instructors := make([]entity.Instructor, 0)
-	for _, instructorRecord := range schema.Instructors {
-		instructors = append(instructors, *instructorRecord.ToInstructor())
+	sections := make([]entity.Section, 0)
+	for _, sectionRecord := range schema.Sections {
+		sections = append(sections, *sectionRecord.ToSection())
 	}
 
 	return &entity.Subject{
@@ -110,12 +138,11 @@ func (schema *SubjectSchema) ToSubject() *entity.Subject {
 		SubjectId:     schema.SubjectId,
 		Name:          schema.Name,
 		Semester:      schema.Semester,
-		Section:       schema.Section,
+		Sections:      sections,
 		Year:          schema.Year,
 		Faculty:       schema.Faculty,
 		Description:   schema.Description,
-		Prerequisites: prerequisites,
-		Instructors:   instructors,
+		Prerequisites: schema.Prerequisites,
 	}
 }
 

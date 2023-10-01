@@ -19,9 +19,8 @@ message PaginateSubjectRequest {
 	string subject_id = 2;
 	string name = 3;
 	repeated int64 semester_whitelist = 4;
-	repeated int64 section_whitelist = 5;
-	int64 year_range_start = 6;
-	int64 year_range_stop = 7;
+	int64 year_range_start = 5;
+	int64 year_range_stop = 6;
 }
 
 message PaginateSubjectResponse {
@@ -44,12 +43,9 @@ message CreateSubjectRequest {
 	string subject_id = 1;
 	string name = 2;
 	int64 semester = 3;
-	int64 section = 4;
-	int64 year = 5;
-	string faculty = 6;
-	string description = 7;
-	repeated int64 prerequisite_ids = 8;
-	repeated int64 instructor_ids = 9;
+	int64 year = 4;
+	string faculty = 5;
+	string description = 6;
 
 	bool is_admin = 99;
 }
@@ -63,12 +59,9 @@ message UpdateSubjectRequest {
 	string subject_id = 2;
 	string name = 3;
 	int64 semester = 4;
-	int64 section = 5;
-	int64 year = 6;
-	string faculty = 7;
-	string description = 8;
-	repeated int64 prerequisited_ids = 9;
-	repeated int64 instructor_ids = 10;
+	int64 year = 5;
+	string faculty = 6;
+	string description = 7;
 
 	bool is_admin = 99;
 }
