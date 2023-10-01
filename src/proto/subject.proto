@@ -62,6 +62,7 @@ message UpdateSubjectRequest {
 	int64 year = 5;
 	string faculty = 6;
 	string description = 7;
+	repeated string prerequisites = 8;
 
 	bool is_admin = 99;
 }

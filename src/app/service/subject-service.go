@@ -27,14 +27,15 @@ func SubjectToPb(subject *entity.Subject) *pb.Subject {
 	}
 
 	return &pb.Subject{
-		Id:          subject.Id,
-		SubjectId:   subject.SubjectId,
-		Name:        subject.Name,
-		Semester:    subject.Semester,
-		SectionIds:  sectionIds,
-		Year:        subject.Year,
-		Faculty:     subject.Faculty,
-		Description: subject.Description,
+		Id:            subject.Id,
+		SubjectId:     subject.SubjectId,
+		Name:          subject.Name,
+		Semester:      subject.Semester,
+		SectionIds:    sectionIds,
+		Year:          subject.Year,
+		Faculty:       subject.Faculty,
+		Description:   subject.Description,
+		Prerequisites: subject.Prerequisites,
 	}
 }
 
@@ -150,18 +151,21 @@ func (s *SubjectService) UpdateSubject(ctx context.Context, req *pb.UpdateSubjec
 	}
 
 	subject := entity.Subject{
-		Id:          req.Id,
-		SubjectId:   req.SubjectId,
-		Name:        req.Name,
-		Semester:    req.Semester,
-		Year:        req.Year,
-		Faculty:     req.Faculty,
-		Description: req.Description,
+		Id:            req.Id,
+		SubjectId:     req.SubjectId,
+		Name:          req.Name,
+		Semester:      req.Semester,
+		Year:          req.Year,
+		Faculty:       req.Faculty,
+		Description:   req.Description,
+		Prerequisites: req.Prerequisites,
 	}
 
 	err := s.subjectRepo.UpdateSubject(&subject)
 	if err != nil {
 		switch err {
+		case entity.ErrNotFound:
+			return nil, status.Error(codes.NotFound, "subject with given ID not found")
 		case entity.ErrConstraintViolation:
 			return nil, status.Error(codes.InvalidArgument, "bad request")
 		default:

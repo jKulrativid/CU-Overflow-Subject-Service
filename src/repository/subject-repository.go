@@ -6,6 +6,7 @@ import (
 
 	"github.com/jKulrativid/SA-Subject-Service/src/app/entity"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type SubjectRepository struct {
@@ -120,9 +121,60 @@ func (r *SubjectRepository) CreateSubject(subject *entity.Subject) error {
 }
 
 func (r *SubjectRepository) UpdateSubject(subject *entity.Subject) error {
+	subjectRecord := NewSubjectSchema(subject)
+
+	txErr := r.db.Transaction(func(tx *gorm.DB) error {
+		tx = tx.Where("id = ?", subject.Id).Updates(subjectRecord)
+		if err := tx.Error; err != nil {
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return entity.ErrConstraintViolation
+			}
+			return err
+		}
+
+		if tx.RowsAffected == 0 {
+			return entity.ErrNotFound
+		}
+
+		if err := tx.Preload("Sections").First(&subjectRecord, subject.Id).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				tx.Rollback()
+				return entity.ErrNotFound
+			}
+			return err
+		}
+
+		return nil
+	})
+
+	if txErr != nil {
+		return txErr
+	}
+
+	*subject = *subjectRecord.ToSubject()
+
 	return nil
 }
 
 func (r *SubjectRepository) DeleteSubjectById(id int64) (*entity.Subject, error) {
-	return nil, nil
+	var subjectRecord SubjectSchema
+
+	txErr := r.db.Transaction(func(tx *gorm.DB) error {
+		tx = r.db.Clauses(clause.Returning{}).Delete(&subjectRecord, id)
+		if err := tx.Error; err != nil {
+			return nil
+		}
+
+		if tx.RowsAffected == 0 {
+			return entity.ErrNotFound
+		}
+
+		return nil
+	})
+
+	if txErr != nil {
+		return nil, txErr
+	}
+
+	return subjectRecord.ToSubject(), nil
 }
