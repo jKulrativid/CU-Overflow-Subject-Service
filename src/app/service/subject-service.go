@@ -239,9 +239,45 @@ func (s *SubjectService) CreateSection(ctx context.Context, req *pb.CreateSectio
 }
 
 func (s *SubjectService) UpdateSection(ctx context.Context, req *pb.UpdateSectionRequest) (*pb.UpdateSectionResponse, error) {
-	return nil, nil
+	if req.Number < 1 || req.Number > 100 {
+		return nil, status.Error(codes.InvalidArgument, "section number must be 1-100")
+	}
+
+	section := entity.Section{
+		Id:          req.Id,
+		Number:      req.Number,
+		Description: req.Description,
+	}
+
+	err := s.subjectRepo.UpdateSection(&section)
+	if err != nil {
+		switch err {
+		case entity.ErrNotFound:
+			return nil, status.Error(codes.InvalidArgument, "subject with given subject id not found")
+		case entity.ErrConstraintViolation:
+			return nil, status.Error(codes.InvalidArgument, "subject already has section with given number")
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
+	return &pb.UpdateSectionResponse{Section: SectionToPb(&section)}, nil
 }
 
 func (s *SubjectService) DeleteSection(ctx context.Context, req *pb.DeleteSectionRequest) (*pb.DeleteSectionResponse, error) {
-	return nil, nil
+	if req.Id == 0 {
+		return nil, status.Error(codes.InvalidArgument, "section ID not provided")
+	}
+
+	section, err := s.subjectRepo.DeleteSection(req.Id)
+	if err != nil {
+		switch err {
+		case entity.ErrNotFound:
+			return nil, status.Error(codes.InvalidArgument, "section with given ID not found")
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
+	return &pb.DeleteSectionResponse{Section: SectionToPb(section)}, nil
 }

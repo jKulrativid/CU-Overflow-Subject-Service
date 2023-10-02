@@ -96,7 +96,6 @@ message CreateSectionResponse {
 
 message UpdateSectionRequest {
 	int64 id = 1;
-	int64 subject_id = 2;
 	int64 number = 3;
 	string description = 4;
 }

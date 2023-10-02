@@ -125,7 +125,7 @@ func (r *SubjectRepository) UpdateSubject(subject *entity.Subject) error {
 	subjectRecord := NewSubjectSchema(subject)
 
 	txErr := r.db.Transaction(func(tx *gorm.DB) error {
-		tx = tx.Omit("Sections").Where("id = ?", subject.Id).Updates(subjectRecord)
+		tx = tx.Clauses(clause.Returning{}).Omit("Sections").Where("id = ?", subject.Id).Updates(subjectRecord)
 		if err := tx.Error; err != nil {
 			if errors.Is(err, gorm.ErrDuplicatedKey) {
 				return entity.ErrConstraintViolation
@@ -135,14 +135,6 @@ func (r *SubjectRepository) UpdateSubject(subject *entity.Subject) error {
 
 		if tx.RowsAffected == 0 {
 			return entity.ErrNotFound
-		}
-
-		if err := tx.Preload("Sections").First(&subjectRecord, subject.Id).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				tx.Rollback()
-				return entity.ErrNotFound
-			}
-			return err
 		}
 
 		return nil
@@ -207,9 +199,54 @@ func (r *SubjectRepository) CreateSection(section *entity.Section) error {
 }
 
 func (r *SubjectRepository) UpdateSection(section *entity.Section) error {
+	sectionRecord := NewSectionSchema(section)
+
+	txErr := r.db.Transaction(func(tx *gorm.DB) error {
+		tx = tx.Clauses(clause.Returning{}).Omit("SubjectId").Where("id = ?", section.Id).Updates(&sectionRecord)
+		if err := tx.Error; err != nil {
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return entity.ErrConstraintViolation
+			}
+			return err
+		}
+
+		if tx.RowsAffected == 0 {
+			return entity.ErrNotFound
+		}
+
+		return nil
+	})
+
+	if txErr != nil {
+		return txErr
+	}
+
+	*section = *sectionRecord.ToSection()
+
 	return nil
 }
 
 func (r *SubjectRepository) DeleteSection(id int64) (*entity.Section, error) {
-	return nil, nil
+	var sectionRecord SectionSchema
+
+	fmt.Println(id)
+
+	txErr := r.db.Transaction(func(tx *gorm.DB) error {
+		tx = tx.Clauses(clause.Returning{}).Delete(&sectionRecord, id)
+		if err := tx.Error; err != nil {
+			return err
+		}
+
+		if tx.RowsAffected == 0 {
+			return entity.ErrNotFound
+		}
+
+		return nil
+	})
+
+	if txErr != nil {
+		return nil, txErr
+	}
+
+	return sectionRecord.ToSection(), nil
 }

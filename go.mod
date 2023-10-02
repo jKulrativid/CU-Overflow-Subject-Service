@@ -3,7 +3,6 @@ module github.com/jKulrativid/SA-Subject-Service
 go 1.21.1
 
 require (
-	github.com/jackc/pgconn v1.14.1
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/lib/pq v1.10.9
 	google.golang.org/grpc v1.58.1
@@ -14,10 +13,7 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect

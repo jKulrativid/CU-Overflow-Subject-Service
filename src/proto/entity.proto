@@ -27,8 +27,7 @@ message SubjectMetadata {
 	string subject_id = 2;
 	string name = 3;
 	int64 semester = 4;
-	int64 section = 5;
-	int64 year = 6;
+	int64 year = 5;
 }
 
 message Instructor {
