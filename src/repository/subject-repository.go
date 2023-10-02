@@ -229,8 +229,6 @@ func (r *SubjectRepository) UpdateSection(section *entity.Section) error {
 func (r *SubjectRepository) DeleteSection(id int64) (*entity.Section, error) {
 	var sectionRecord SectionSchema
 
-	fmt.Println(id)
-
 	txErr := r.db.Transaction(func(tx *gorm.DB) error {
 		tx = tx.Clauses(clause.Returning{}).Delete(&sectionRecord, id)
 		if err := tx.Error; err != nil {
