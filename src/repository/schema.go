@@ -59,8 +59,8 @@ func (InstructorSchema) TableName() string {
 
 type SectionSchema struct {
 	gorm.Model
-	SubjectId   uint
-	Number      int64              `gorm:"not null"`
+	SubjectId   uint               `gorm:"index:ux_subject_id_section_number,unique"`
+	Number      int64              `gorm:"not null;index:ux_subject_id_section_number,unique"`
 	Description string             `gorm:"type:text"`
 	Instructors []InstructorSchema `gorm:"many2many:section_instructors"`
 }
@@ -73,6 +73,7 @@ func NewSectionSchema(section *entity.Section) *SectionSchema {
 
 	return &SectionSchema{
 		Model:       gorm.Model{ID: uint(section.Id)},
+		SubjectId:   uint(section.SubjectId),
 		Number:      section.Number,
 		Description: section.Description,
 		Instructors: instructorSchemas,
@@ -86,6 +87,7 @@ func (schema *SectionSchema) ToSection() *entity.Section {
 	}
 	return &entity.Section{
 		Id:          int64(schema.ID),
+		SubjectId:   int64(schema.SubjectId),
 		Number:      schema.Number,
 		Description: schema.Description,
 		Instructors: instructors,
@@ -101,7 +103,7 @@ type SubjectSchema struct {
 	SubjectId     string
 	Name          string          `gorm:"not null;type:varchar(255);index:ix_subject_name;index:ux_subject_name_semester_year_constraint,unique"`
 	Semester      int64           `gorm:"not null;index:ix_subject_semester;index:ux_subject_name_semester_year_constraint,unique"`
-	Sections      []SectionSchema `gorm:"foreignKey:SubjectId"`
+	Sections      []SectionSchema `gorm:"foreignKey:SubjectId;references:ID"`
 	Year          int64           `gorm:"not null;index:ix_subject_year;index:ux_subject_name_semester_year_constraint,unique"`
 	Faculty       string          `gorm:"type:varchar(255)"`
 	Description   string          `gorm:"type:text"`

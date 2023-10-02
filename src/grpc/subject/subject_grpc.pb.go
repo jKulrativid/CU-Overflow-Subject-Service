@@ -27,6 +27,9 @@ type SubjectServiceClient interface {
 	CreateSubject(ctx context.Context, in *CreateSubjectRequest, opts ...grpc.CallOption) (*CreateSubjectResponse, error)
 	UpdateSubject(ctx context.Context, in *UpdateSubjectRequest, opts ...grpc.CallOption) (*UpdateSubjectResponse, error)
 	DeleteSubject(ctx context.Context, in *DeleteSubjectRequest, opts ...grpc.CallOption) (*DeleteSubjectResponse, error)
+	CreateSection(ctx context.Context, in *CreateSectionRequest, opts ...grpc.CallOption) (*CreateSectionResponse, error)
+	UpdateSection(ctx context.Context, in *UpdateSectionRequest, opts ...grpc.CallOption) (*UpdateSectionResponse, error)
+	DeleteSection(ctx context.Context, in *DeleteSectionRequest, opts ...grpc.CallOption) (*DeleteSectionResponse, error)
 	PaginatePostBySubject(ctx context.Context, in *PaginatePostBySubjectRequest, opts ...grpc.CallOption) (*PaginatePostBySubjectResponse, error)
 	PaginateFileBySubject(ctx context.Context, in *PaginateFileBySubjectRequest, opts ...grpc.CallOption) (*PaginateFileBySubjectResponse, error)
 }
@@ -84,6 +87,33 @@ func (c *subjectServiceClient) DeleteSubject(ctx context.Context, in *DeleteSubj
 	return out, nil
 }
 
+func (c *subjectServiceClient) CreateSection(ctx context.Context, in *CreateSectionRequest, opts ...grpc.CallOption) (*CreateSectionResponse, error) {
+	out := new(CreateSectionResponse)
+	err := c.cc.Invoke(ctx, "/SubjectService/CreateSection", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *subjectServiceClient) UpdateSection(ctx context.Context, in *UpdateSectionRequest, opts ...grpc.CallOption) (*UpdateSectionResponse, error) {
+	out := new(UpdateSectionResponse)
+	err := c.cc.Invoke(ctx, "/SubjectService/UpdateSection", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *subjectServiceClient) DeleteSection(ctx context.Context, in *DeleteSectionRequest, opts ...grpc.CallOption) (*DeleteSectionResponse, error) {
+	out := new(DeleteSectionResponse)
+	err := c.cc.Invoke(ctx, "/SubjectService/DeleteSection", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *subjectServiceClient) PaginatePostBySubject(ctx context.Context, in *PaginatePostBySubjectRequest, opts ...grpc.CallOption) (*PaginatePostBySubjectResponse, error) {
 	out := new(PaginatePostBySubjectResponse)
 	err := c.cc.Invoke(ctx, "/SubjectService/PaginatePostBySubject", in, out, opts...)
@@ -111,6 +141,9 @@ type SubjectServiceServer interface {
 	CreateSubject(context.Context, *CreateSubjectRequest) (*CreateSubjectResponse, error)
 	UpdateSubject(context.Context, *UpdateSubjectRequest) (*UpdateSubjectResponse, error)
 	DeleteSubject(context.Context, *DeleteSubjectRequest) (*DeleteSubjectResponse, error)
+	CreateSection(context.Context, *CreateSectionRequest) (*CreateSectionResponse, error)
+	UpdateSection(context.Context, *UpdateSectionRequest) (*UpdateSectionResponse, error)
+	DeleteSection(context.Context, *DeleteSectionRequest) (*DeleteSectionResponse, error)
 	PaginatePostBySubject(context.Context, *PaginatePostBySubjectRequest) (*PaginatePostBySubjectResponse, error)
 	PaginateFileBySubject(context.Context, *PaginateFileBySubjectRequest) (*PaginateFileBySubjectResponse, error)
 	mustEmbedUnimplementedSubjectServiceServer()
@@ -134,6 +167,15 @@ func (UnimplementedSubjectServiceServer) UpdateSubject(context.Context, *UpdateS
 }
 func (UnimplementedSubjectServiceServer) DeleteSubject(context.Context, *DeleteSubjectRequest) (*DeleteSubjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSubject not implemented")
+}
+func (UnimplementedSubjectServiceServer) CreateSection(context.Context, *CreateSectionRequest) (*CreateSectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSection not implemented")
+}
+func (UnimplementedSubjectServiceServer) UpdateSection(context.Context, *UpdateSectionRequest) (*UpdateSectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateSection not implemented")
+}
+func (UnimplementedSubjectServiceServer) DeleteSection(context.Context, *DeleteSectionRequest) (*DeleteSectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSection not implemented")
 }
 func (UnimplementedSubjectServiceServer) PaginatePostBySubject(context.Context, *PaginatePostBySubjectRequest) (*PaginatePostBySubjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PaginatePostBySubject not implemented")
@@ -244,6 +286,60 @@ func _SubjectService_DeleteSubject_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SubjectService_CreateSection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubjectServiceServer).CreateSection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SubjectService/CreateSection",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubjectServiceServer).CreateSection(ctx, req.(*CreateSectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SubjectService_UpdateSection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubjectServiceServer).UpdateSection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SubjectService/UpdateSection",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubjectServiceServer).UpdateSection(ctx, req.(*UpdateSectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SubjectService_DeleteSection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteSectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubjectServiceServer).DeleteSection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SubjectService/DeleteSection",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubjectServiceServer).DeleteSection(ctx, req.(*DeleteSectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _SubjectService_PaginatePostBySubject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PaginatePostBySubjectRequest)
 	if err := dec(in); err != nil {
@@ -306,6 +402,18 @@ var SubjectService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSubject",
 			Handler:    _SubjectService_DeleteSubject_Handler,
+		},
+		{
+			MethodName: "CreateSection",
+			Handler:    _SubjectService_CreateSection_Handler,
+		},
+		{
+			MethodName: "UpdateSection",
+			Handler:    _SubjectService_UpdateSection_Handler,
+		},
+		{
+			MethodName: "DeleteSection",
+			Handler:    _SubjectService_DeleteSection_Handler,
 		},
 		{
 			MethodName: "PaginatePostBySubject",

@@ -4,9 +4,10 @@ option go_package = "./subject";
 
 message Section {
 	int64 id = 1;
-	int64 number = 2;
-	string description = 3;
-	int64 instructor_ids = 4;
+	int64 subject_id = 2;
+	int64 number = 3;
+	string description = 4;
+	repeated int64 instructor_ids = 5;
 }
 
 message Subject {

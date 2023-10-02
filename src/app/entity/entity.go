@@ -21,6 +21,7 @@ type Instructor struct {
 
 type Section struct {
 	Id          int64
+	SubjectId   int64
 	Number      int64
 	Description string
 	Instructors []Instructor

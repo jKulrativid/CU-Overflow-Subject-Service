@@ -39,6 +39,21 @@ func SubjectToPb(subject *entity.Subject) *pb.Subject {
 	}
 }
 
+func SectionToPb(section *entity.Section) *pb.Section {
+	instructorIds := make([]int64, 0)
+	for _, instructor := range section.Instructors {
+		instructorIds = append(instructorIds, instructor.Id)
+	}
+
+	return &pb.Section{
+		Id:            section.Id,
+		SubjectId:     section.SubjectId,
+		Number:        section.Number,
+		Description:   section.Description,
+		InstructorIds: instructorIds,
+	}
+}
+
 func (s *SubjectService) PaginateSubjects(ctx context.Context, req *pb.PaginateSubjectRequest) (*pb.PaginateSubjectResponse, error) {
 	if req.PageNumber < 1 {
 		return nil, status.Error(codes.InvalidArgument, "page number must be a positive integer")
@@ -192,4 +207,41 @@ func (s *SubjectService) DeleteSubject(ctx context.Context, req *pb.DeleteSubjec
 	}
 
 	return &pb.DeleteSubjectResponse{Subject: SubjectToPb(subject)}, nil
+}
+
+func (s *SubjectService) CreateSection(ctx context.Context, req *pb.CreateSectionRequest) (*pb.CreateSectionResponse, error) {
+	if req.SubjectId == 0 {
+		return nil, status.Error(codes.InvalidArgument, "subject id must be provided")
+	}
+	if req.Number < 1 || req.Number > 100 {
+		return nil, status.Error(codes.InvalidArgument, "section number must be 1-100")
+	}
+
+	section := entity.Section{
+		SubjectId:   req.SubjectId,
+		Number:      req.Number,
+		Description: req.Description,
+	}
+
+	err := s.subjectRepo.CreateSection(&section)
+	if err != nil {
+		switch err {
+		case entity.ErrNotFound:
+			return nil, status.Error(codes.InvalidArgument, "subject with given subject id not found")
+		case entity.ErrConstraintViolation:
+			return nil, status.Error(codes.InvalidArgument, "subject already has section with given number")
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
+	return &pb.CreateSectionResponse{Section: SectionToPb(&section)}, nil
+}
+
+func (s *SubjectService) UpdateSection(ctx context.Context, req *pb.UpdateSectionRequest) (*pb.UpdateSectionResponse, error) {
+	return nil, nil
+}
+
+func (s *SubjectService) DeleteSection(ctx context.Context, req *pb.DeleteSectionRequest) (*pb.DeleteSectionResponse, error) {
+	return nil, nil
 }

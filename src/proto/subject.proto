@@ -10,6 +10,9 @@ service SubjectService {
 	rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
 	rpc UpdateSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
 	rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse);
+	rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse);
+	rpc UpdateSection(UpdateSectionRequest) returns (UpdateSectionResponse);
+	rpc DeleteSection(DeleteSectionRequest) returns (DeleteSectionResponse);
 	rpc PaginatePostBySubject(PaginatePostBySubjectRequest) returns (PaginatePostBySubjectResponse);
 	rpc PaginateFileBySubject(PaginateFileBySubjectRequest) returns (PaginateFileBySubjectResponse);
 }
@@ -79,6 +82,35 @@ message DeleteSubjectRequest {
 
 message DeleteSubjectResponse {
 	Subject subject = 1;
+}
+
+message CreateSectionRequest {
+	int64 subject_id = 1;
+	int64 number = 2;
+	string description = 3;
+}
+
+message CreateSectionResponse {
+	Section section = 1;
+}
+
+message UpdateSectionRequest {
+	int64 id = 1;
+	int64 subject_id = 2;
+	int64 number = 3;
+	string description = 4;
+}
+
+message UpdateSectionResponse {
+	Section section = 1;
+}
+
+message DeleteSectionRequest {
+	int64 id = 1;
+}
+
+message DeleteSectionResponse {
+	Section section =1;
 }
 
 message PaginatePostBySubjectRequest {}

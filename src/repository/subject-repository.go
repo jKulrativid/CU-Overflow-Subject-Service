@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/jKulrativid/SA-Subject-Service/src/app/entity"
 	"gorm.io/gorm"
@@ -101,7 +102,7 @@ func (r *SubjectRepository) CreateSubject(subject *entity.Subject) error {
 	subjectRecord := NewSubjectSchema(subject)
 
 	txErr := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Omit("Sections.*").Create(subjectRecord).Error; err != nil {
+		if err := tx.Omit("Sections").Create(subjectRecord).Error; err != nil {
 			if errors.Is(err, gorm.ErrDuplicatedKey) {
 				return entity.ErrConstraintViolation
 			}
@@ -124,7 +125,7 @@ func (r *SubjectRepository) UpdateSubject(subject *entity.Subject) error {
 	subjectRecord := NewSubjectSchema(subject)
 
 	txErr := r.db.Transaction(func(tx *gorm.DB) error {
-		tx = tx.Where("id = ?", subject.Id).Updates(subjectRecord)
+		tx = tx.Omit("Sections").Where("id = ?", subject.Id).Updates(subjectRecord)
 		if err := tx.Error; err != nil {
 			if errors.Is(err, gorm.ErrDuplicatedKey) {
 				return entity.ErrConstraintViolation
@@ -177,4 +178,38 @@ func (r *SubjectRepository) DeleteSubjectById(id int64) (*entity.Subject, error)
 	}
 
 	return subjectRecord.ToSubject(), nil
+}
+
+func (r *SubjectRepository) CreateSection(section *entity.Section) error {
+	sectionRecord := NewSectionSchema(section)
+
+	txErr := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Omit("Instructors.*").Create(sectionRecord).Error; err != nil {
+			if strings.Contains(err.Error(), "23503") {
+				return entity.ErrNotFound
+			}
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return entity.ErrConstraintViolation
+			}
+			return err
+		}
+
+		return nil
+	})
+
+	if txErr != nil {
+		return txErr
+	}
+
+	*section = *sectionRecord.ToSection()
+
+	return nil
+}
+
+func (r *SubjectRepository) UpdateSection(section *entity.Section) error {
+	return nil
+}
+
+func (r *SubjectRepository) DeleteSection(id int64) (*entity.Section, error) {
+	return nil, nil
 }
