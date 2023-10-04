@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type SubjectServiceClient interface {
 	PaginateSubjects(ctx context.Context, in *PaginateSubjectRequest, opts ...grpc.CallOption) (*PaginateSubjectResponse, error)
 	GetSubjectById(ctx context.Context, in *GetSubjectByIdRequest, opts ...grpc.CallOption) (*GetSubjectByIdResponse, error)
+	ValidateSubjectId(ctx context.Context, in *ValidateSubjectIdRequest, opts ...grpc.CallOption) (*ValidateSubjectIdResponse, error)
 	CreateSubject(ctx context.Context, in *CreateSubjectRequest, opts ...grpc.CallOption) (*CreateSubjectResponse, error)
 	UpdateSubject(ctx context.Context, in *UpdateSubjectRequest, opts ...grpc.CallOption) (*UpdateSubjectResponse, error)
 	DeleteSubject(ctx context.Context, in *DeleteSubjectRequest, opts ...grpc.CallOption) (*DeleteSubjectResponse, error)
@@ -54,6 +55,15 @@ func (c *subjectServiceClient) PaginateSubjects(ctx context.Context, in *Paginat
 func (c *subjectServiceClient) GetSubjectById(ctx context.Context, in *GetSubjectByIdRequest, opts ...grpc.CallOption) (*GetSubjectByIdResponse, error) {
 	out := new(GetSubjectByIdResponse)
 	err := c.cc.Invoke(ctx, "/SubjectService/GetSubjectById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *subjectServiceClient) ValidateSubjectId(ctx context.Context, in *ValidateSubjectIdRequest, opts ...grpc.CallOption) (*ValidateSubjectIdResponse, error) {
+	out := new(ValidateSubjectIdResponse)
+	err := c.cc.Invoke(ctx, "/SubjectService/ValidateSubjectId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +148,7 @@ func (c *subjectServiceClient) PaginateFileBySubject(ctx context.Context, in *Pa
 type SubjectServiceServer interface {
 	PaginateSubjects(context.Context, *PaginateSubjectRequest) (*PaginateSubjectResponse, error)
 	GetSubjectById(context.Context, *GetSubjectByIdRequest) (*GetSubjectByIdResponse, error)
+	ValidateSubjectId(context.Context, *ValidateSubjectIdRequest) (*ValidateSubjectIdResponse, error)
 	CreateSubject(context.Context, *CreateSubjectRequest) (*CreateSubjectResponse, error)
 	UpdateSubject(context.Context, *UpdateSubjectRequest) (*UpdateSubjectResponse, error)
 	DeleteSubject(context.Context, *DeleteSubjectRequest) (*DeleteSubjectResponse, error)
@@ -158,6 +169,9 @@ func (UnimplementedSubjectServiceServer) PaginateSubjects(context.Context, *Pagi
 }
 func (UnimplementedSubjectServiceServer) GetSubjectById(context.Context, *GetSubjectByIdRequest) (*GetSubjectByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubjectById not implemented")
+}
+func (UnimplementedSubjectServiceServer) ValidateSubjectId(context.Context, *ValidateSubjectIdRequest) (*ValidateSubjectIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateSubjectId not implemented")
 }
 func (UnimplementedSubjectServiceServer) CreateSubject(context.Context, *CreateSubjectRequest) (*CreateSubjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSubject not implemented")
@@ -228,6 +242,24 @@ func _SubjectService_GetSubjectById_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SubjectServiceServer).GetSubjectById(ctx, req.(*GetSubjectByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SubjectService_ValidateSubjectId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateSubjectIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubjectServiceServer).ValidateSubjectId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SubjectService/ValidateSubjectId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubjectServiceServer).ValidateSubjectId(ctx, req.(*ValidateSubjectIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -390,6 +422,10 @@ var SubjectService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSubjectById",
 			Handler:    _SubjectService_GetSubjectById_Handler,
+		},
+		{
+			MethodName: "ValidateSubjectId",
+			Handler:    _SubjectService_ValidateSubjectId_Handler,
 		},
 		{
 			MethodName: "CreateSubject",

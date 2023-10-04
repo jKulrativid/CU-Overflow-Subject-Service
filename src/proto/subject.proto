@@ -7,6 +7,7 @@ import "entity.proto";
 service SubjectService {
 	rpc PaginateSubjects(PaginateSubjectRequest) returns (PaginateSubjectResponse);
 	rpc GetSubjectById(GetSubjectByIdRequest) returns (GetSubjectByIdResponse);
+	rpc ValidateSubjectId(ValidateSubjectIdRequest) returns (ValidateSubjectIdResponse);
 	rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
 	rpc UpdateSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
 	rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse);
@@ -32,6 +33,16 @@ message PaginateSubjectResponse {
 	int64 page_count = 3;
 	int64 total_count = 4;
 	repeated SubjectMetadata subjects = 5;
+}
+
+message ValidateSubjectIdRequest {
+	int64 id = 1;
+
+	bool is_admin = 99;
+}
+
+message ValidateSubjectIdResponse {
+	bool valid = 1;
 }
 
 message GetSubjectByIdRequest {

@@ -104,6 +104,20 @@ func (s *SubjectService) PaginateSubjects(ctx context.Context, req *pb.PaginateS
 	return &resp, nil
 }
 
+func (s *SubjectService) ValidateSubjectId(ctx context.Context, req *pb.ValidateSubjectIdRequest) (*pb.ValidateSubjectIdResponse, error) {
+	_, err := s.subjectRepo.FindSubjectById(req.Id)
+	if err != nil {
+		switch err {
+		case entity.ErrNotFound:
+			return &pb.ValidateSubjectIdResponse{Valid: false}, nil
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
+	return &pb.ValidateSubjectIdResponse{Valid: true}, nil
+}
+
 func (s *SubjectService) GetSubjectById(ctx context.Context, req *pb.GetSubjectByIdRequest) (*pb.GetSubjectByIdResponse, error) {
 	subject, err := s.subjectRepo.FindSubjectById(req.Id)
 	if err != nil {
