@@ -133,9 +133,13 @@ func (s *SubjectService) GetSubjectById(ctx context.Context, req *pb.GetSubjectB
 }
 
 func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjectRequest) (*pb.CreateSubjectResponse, error) {
+	if !req.IsAdmin {
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
+	}
 	if req.SubjectId == "" {
 		return nil, status.Error(codes.InvalidArgument, "subject ID not provided")
 	}
+
 	if req.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "subject name not provided")
 	}
@@ -172,6 +176,10 @@ func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjec
 }
 
 func (s *SubjectService) UpdateSubject(ctx context.Context, req *pb.UpdateSubjectRequest) (*pb.UpdateSubjectResponse, error) {
+	if !req.IsAdmin {
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
 	if req.Semester != 0 && (req.Semester < 1 || req.Semester > 3) {
 		return nil, status.Error(codes.InvalidArgument, "subject semester should be 1,2 or 3")
 	}
@@ -206,6 +214,10 @@ func (s *SubjectService) UpdateSubject(ctx context.Context, req *pb.UpdateSubjec
 }
 
 func (s *SubjectService) DeleteSubject(ctx context.Context, req *pb.DeleteSubjectRequest) (*pb.DeleteSubjectResponse, error) {
+	if !req.IsAdmin {
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
 	if req.Id < 0 {
 		return nil, status.Error(codes.InvalidArgument, "invalid ID")
 	}
@@ -224,6 +236,10 @@ func (s *SubjectService) DeleteSubject(ctx context.Context, req *pb.DeleteSubjec
 }
 
 func (s *SubjectService) CreateSection(ctx context.Context, req *pb.CreateSectionRequest) (*pb.CreateSectionResponse, error) {
+	if !req.IsAdmin {
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
 	if req.SubjectId == 0 {
 		return nil, status.Error(codes.InvalidArgument, "subject id must be provided")
 	}
@@ -253,6 +269,10 @@ func (s *SubjectService) CreateSection(ctx context.Context, req *pb.CreateSectio
 }
 
 func (s *SubjectService) UpdateSection(ctx context.Context, req *pb.UpdateSectionRequest) (*pb.UpdateSectionResponse, error) {
+	if !req.IsAdmin {
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
 	if req.Number < 1 || req.Number > 100 {
 		return nil, status.Error(codes.InvalidArgument, "section number must be 1-100")
 	}
@@ -279,6 +299,10 @@ func (s *SubjectService) UpdateSection(ctx context.Context, req *pb.UpdateSectio
 }
 
 func (s *SubjectService) DeleteSection(ctx context.Context, req *pb.DeleteSectionRequest) (*pb.DeleteSectionResponse, error) {
+	if !req.IsAdmin {
+		return nil, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
 	if req.Id == 0 {
 		return nil, status.Error(codes.InvalidArgument, "section ID not provided")
 	}
