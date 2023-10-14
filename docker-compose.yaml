@@ -12,9 +12,11 @@ services:
   subject-db:
     image: postgres:16.0-alpine3.18
     restart: always
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=subject
-      - POSTGRES_PASSWORD=please_use_long_passphrase_ibeg_you
+      - POSTGRES_USER=${USER}
+      - POSTGRES_PASSWORD=${PASSWORD}
     networks:
       - subject
 

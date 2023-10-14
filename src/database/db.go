@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/jKulrativid/SA-Subject-Service/src/repository"
 	"gorm.io/driver/postgres"
@@ -10,8 +11,16 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func NewDatabaseConnection() (*gorm.DB, error) {
-	dsn := "host=subject-db user=subject password=please_use_long_passphrase_ibeg_you port=5432 sslmode=disable"
+type DatabaseConfig struct {
+	Host     string
+	User     string
+	Password string
+	Port     int
+	SslMode  string
+}
+
+func NewDatabaseConnection(config *DatabaseConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%d sslmode=%s", config.Host, config.User, config.Password, config.Port, config.SslMode)
 	db, err := gorm.Open(postgres.New(postgres.Config{DriverName: "pgx", DSN: dsn}), &gorm.Config{TranslateError: true})
 	if err != nil {
 		return nil, errors.New("failed to connected to DB")

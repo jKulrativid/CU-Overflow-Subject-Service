@@ -1,19 +1,41 @@
 package main
 
 import (
+	"log"
 	"net"
+	"os"
+	"strconv"
 
 	"google.golang.org/grpc"
 
 	"github.com/jKulrativid/SA-Subject-Service/src/app/service"
 	"github.com/jKulrativid/SA-Subject-Service/src/repository"
+	"github.com/joho/godotenv"
 
 	"github.com/jKulrativid/SA-Subject-Service/src/database"
 	pb "github.com/jKulrativid/SA-Subject-Service/src/grpc/subject"
 )
 
 func main() {
-	dbConn, err := database.NewDatabaseConnection()
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	dbPort, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		log.Fatal("Error converting DB port to an integer")
+	}
+
+	dbConfig := database.DatabaseConfig{
+		Host:     os.Getenv("HOST"),
+		User:     os.Getenv("USER"),
+		Password: os.Getenv("PASSWORD"),
+		Port:     dbPort,
+		SslMode:  os.Getenv("SSL_MODE"),
+	}
+
+	dbConn, err := database.NewDatabaseConnection(&dbConfig)
 	if err != nil {
 		panic(err)
 	}
