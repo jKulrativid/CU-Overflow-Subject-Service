@@ -22,17 +22,17 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	dbPort, err := strconv.Atoi(os.Getenv("PORT"))
+	dbPort, err := strconv.Atoi(os.Getenv("POSTGRES_PORT"))
 	if err != nil {
 		log.Fatal("Error converting DB port to an integer")
 	}
 
 	dbConfig := database.DatabaseConfig{
-		Host:     os.Getenv("HOST"),
-		User:     os.Getenv("USER"),
-		Password: os.Getenv("PASSWORD"),
+		Host:     os.Getenv("POSTGRES_HOST"),
+		User:     os.Getenv("POSTGRES_USER"),
+		Password: os.Getenv("POSTGRES_PASSWORD"),
 		Port:     dbPort,
-		SslMode:  os.Getenv("SSL_MODE"),
+		SslMode:  os.Getenv("POSTGRES_SSL_MODE"),
 	}
 
 	dbConn, err := database.NewDatabaseConnection(&dbConfig)
