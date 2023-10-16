@@ -1,6 +1,10 @@
 syntax = "proto3";
 
 option go_package = "./subject";
+option java_multiple_files = true;
+option java_package = "org.example";
+
+package subject;
 
 message Section {
 	int64 id = 1;

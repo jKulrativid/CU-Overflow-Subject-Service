@@ -39,7 +39,7 @@ func NewInstructorServiceClient(cc grpc.ClientConnInterface) InstructorServiceCl
 
 func (c *instructorServiceClient) PaginateInstructor(ctx context.Context, in *PaginateInstructorRequest, opts ...grpc.CallOption) (*PaginateInstructorResponse, error) {
 	out := new(PaginateInstructorResponse)
-	err := c.cc.Invoke(ctx, "/InstructorService/PaginateInstructor", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/subject.InstructorService/PaginateInstructor", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *instructorServiceClient) PaginateInstructor(ctx context.Context, in *Pa
 
 func (c *instructorServiceClient) GetInstructorbyId(ctx context.Context, in *GetInstructorbyIdRequest, opts ...grpc.CallOption) (*GetInstructorbyIdResponse, error) {
 	out := new(GetInstructorbyIdResponse)
-	err := c.cc.Invoke(ctx, "/InstructorService/GetInstructorbyId", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/subject.InstructorService/GetInstructorbyId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *instructorServiceClient) GetInstructorbyId(ctx context.Context, in *Get
 
 func (c *instructorServiceClient) CreateInstructor(ctx context.Context, in *CreateInstructorRequest, opts ...grpc.CallOption) (*CreateInstructorResponse, error) {
 	out := new(CreateInstructorResponse)
-	err := c.cc.Invoke(ctx, "/InstructorService/CreateInstructor", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/subject.InstructorService/CreateInstructor", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *instructorServiceClient) CreateInstructor(ctx context.Context, in *Crea
 
 func (c *instructorServiceClient) UpdateInstructor(ctx context.Context, in *UpdateInstructorRequest, opts ...grpc.CallOption) (*UpdateInstructorResponse, error) {
 	out := new(UpdateInstructorResponse)
-	err := c.cc.Invoke(ctx, "/InstructorService/UpdateInstructor", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/subject.InstructorService/UpdateInstructor", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *instructorServiceClient) UpdateInstructor(ctx context.Context, in *Upda
 
 func (c *instructorServiceClient) DeleteInstructor(ctx context.Context, in *DeleteInstructorRequest, opts ...grpc.CallOption) (*DeleteInstructorResponse, error) {
 	out := new(DeleteInstructorResponse)
-	err := c.cc.Invoke(ctx, "/InstructorService/DeleteInstructor", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/subject.InstructorService/DeleteInstructor", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func _InstructorService_PaginateInstructor_Handler(srv interface{}, ctx context.
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/InstructorService/PaginateInstructor",
+		FullMethod: "/subject.InstructorService/PaginateInstructor",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InstructorServiceServer).PaginateInstructor(ctx, req.(*PaginateInstructorRequest))
@@ -154,7 +154,7 @@ func _InstructorService_GetInstructorbyId_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/InstructorService/GetInstructorbyId",
+		FullMethod: "/subject.InstructorService/GetInstructorbyId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InstructorServiceServer).GetInstructorbyId(ctx, req.(*GetInstructorbyIdRequest))
@@ -172,7 +172,7 @@ func _InstructorService_CreateInstructor_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/InstructorService/CreateInstructor",
+		FullMethod: "/subject.InstructorService/CreateInstructor",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InstructorServiceServer).CreateInstructor(ctx, req.(*CreateInstructorRequest))
@@ -190,7 +190,7 @@ func _InstructorService_UpdateInstructor_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/InstructorService/UpdateInstructor",
+		FullMethod: "/subject.InstructorService/UpdateInstructor",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InstructorServiceServer).UpdateInstructor(ctx, req.(*UpdateInstructorRequest))
@@ -208,7 +208,7 @@ func _InstructorService_DeleteInstructor_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/InstructorService/DeleteInstructor",
+		FullMethod: "/subject.InstructorService/DeleteInstructor",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InstructorServiceServer).DeleteInstructor(ctx, req.(*DeleteInstructorRequest))
@@ -220,7 +220,7 @@ func _InstructorService_DeleteInstructor_Handler(srv interface{}, ctx context.Co
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var InstructorService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "InstructorService",
+	ServiceName: "subject.InstructorService",
 	HandlerType: (*InstructorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
