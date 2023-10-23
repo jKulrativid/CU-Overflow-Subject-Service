@@ -1,8 +1,11 @@
 version: "3"
 
+volumes:
+  subject_data:
+
 services:
   subject-service:
-    container_name: subject_service
+    container_name: subject-service
     build: .
     ports:
       - 8080:8080
@@ -20,6 +23,8 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+    volumes:
+      - subject_data:/var/lib/postgresql/data 
     env_file:
       - .env
     environment:
@@ -31,4 +36,6 @@ services:
 
 networks:
   subject:
+    name: subject_service
     driver: bridge
+    external: true
