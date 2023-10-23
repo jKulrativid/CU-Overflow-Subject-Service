@@ -38,4 +38,4 @@ networks:
   subject:
     name: subject_service
     driver: bridge
-    external: true
+#    external: true

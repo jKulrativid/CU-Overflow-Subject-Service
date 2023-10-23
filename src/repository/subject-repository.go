@@ -172,11 +172,20 @@ func (r *SubjectRepository) DeleteSubjectById(id int64) (*entity.Subject, error)
 	return subjectRecord.ToSubject(), nil
 }
 
-func (r *SubjectRepository) GetSectionByNumberAndSubjectId(sectionNumber int64, subjectId int64) (*entity.Section, error) {
+func (r *SubjectRepository) GetSectionByNumberAndSubjectId(sectionNumber int64, subjectId string, year int64, semester int64) (*entity.Section, error) {
+	subjectRecord := SubjectSchema{}
 	sectionRecord := SectionSchema{}
 
 	txErr := r.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("number = ? and subject_id = ?", sectionNumber, subjectId).First(&sectionRecord).Error; err != nil {
+		if err := tx.Where("year = ? AND semester = ? AND subject_id = ?", year, semester, subjectId).First(&subjectRecord).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return entity.ErrNotFound
+			}
+
+			return err
+		}
+
+		if err := tx.Where("number = ? AND subject_id = ?", sectionNumber, subjectRecord.ID).First(&sectionRecord).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return entity.ErrNotFound
 			}

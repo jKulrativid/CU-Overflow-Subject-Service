@@ -11,7 +11,7 @@ type SubjectRepository interface {
 	CreateSubject(subject *entity.Subject) error
 	UpdateSubject(subject *entity.Subject) error
 	DeleteSubjectById(id int64) (*entity.Subject, error)
-	GetSectionByNumberAndSubjectId(sectionNumber int64, subjectId int64) (*entity.Section, error)
+	GetSectionByNumberAndSubjectId(sectionNumber int64, subjectId string, year int64, semester int64) (*entity.Section, error)
 	CreateSection(section *entity.Section) error
 	UpdateSection(section *entity.Section) error
 	DeleteSection(id int64) (*entity.Section, error)

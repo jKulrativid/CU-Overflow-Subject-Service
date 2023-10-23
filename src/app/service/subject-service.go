@@ -236,11 +236,7 @@ func (s *SubjectService) DeleteSubject(ctx context.Context, req *pb.DeleteSubjec
 }
 
 func (s *SubjectService) ValidateSection(ctx context.Context, req *pb.ValidateSectionRequest) (*pb.ValidateSectionResponse, error) {
-	if req.SectionNumber < 1 || req.SectionNumber > 100 {
-		return nil, status.Error(codes.InvalidArgument, "section number must be between 1 and 100")
-	}
-
-	_, err := s.subjectRepo.GetSectionByNumberAndSubjectId(req.SectionNumber, req.SubjectId)
+	_, err := s.subjectRepo.GetSectionByNumberAndSubjectId(req.SectionNumber, req.SubjectId, req.Year, req.Semester)
 	if err != nil {
 		switch err {
 		case entity.ErrNotFound:
