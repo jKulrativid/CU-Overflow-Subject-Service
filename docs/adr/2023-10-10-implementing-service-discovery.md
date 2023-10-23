@@ -2,33 +2,35 @@
 
 ## Status
 
-waiting for team discussion and approval
+ACCEPTED
 
 ## Context
 
 Service discovery has been one of our non-functional requirements
 since we have already decided to use microservice architecture.
+Although we want to automated daunt tasks such as static IP configuration,
+over-engineering must be avoided as much as possible.
 
-While data-plane service discovery tools such as Nginx and Envoy
-might work well for a simple microservice architecture, complex services, for example,
-elastically scalable services require more sophisticated tools like service mesh.
+Moreover, service discovery service should not create additional task to the team members.
+
+Our candidates are Consul, Etcd, and Kubernetes Ingress (K8S Ingress).
+
+Etcd is the least preferred since no member in our team has experience on it.
+
+Consul is a powerful service discovery and service mesh tools.
+Its documentation is straightforward and well-written.
+However, both Consul and Etcd require deployment of sidecar container
+and extra implementation.
+
+K8S Ingress seems to be the most suitable
+since it requires only images from other services
+which has already been implemented and most of our members
+have experience with K8S.
 
 ## Decision
 
-Most service mesh tools have supported static service registration,
-thus moving to service mesh tools may be a better choice.
-
-According to [DevOps Cube](https://devopscube.com/open-source-service-discovery/),
-three potential candidates have been proposed, which are Etcd, Consul, and Apache Zookeeper.
-
-The zookeeper should be remove from consideration since it does not support HTTP/JSON API.
-
-The docs of Etcd is quite sucks, on the contrary, Consul's official toturial
-provides elaborated walkthrough guides with detailed examples.
-
-Furthermore, Consul has support for load-balancer integration, fostering service scalability
-which is the most significant non-functional property of our project.
+We chose K8S Ingress by unanimity.
 
 ## Consequences
 
-Not decided yet!
+Better dev experience since static configuration is not needed.
