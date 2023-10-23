@@ -172,6 +172,27 @@ func (r *SubjectRepository) DeleteSubjectById(id int64) (*entity.Subject, error)
 	return subjectRecord.ToSubject(), nil
 }
 
+func (r *SubjectRepository) GetSectionByNumberAndSubjectId(sectionNumber int64, subjectId int64) (*entity.Section, error) {
+	sectionRecord := SectionSchema{}
+
+	txErr := r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("number = ? and subject_id = ?", sectionNumber, subjectId).First(&sectionRecord).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return entity.ErrNotFound
+			}
+			return err
+		}
+
+		return nil
+	})
+
+	if txErr != nil {
+		return nil, txErr
+	}
+
+	return sectionRecord.ToSection(), nil
+}
+
 func (r *SubjectRepository) CreateSection(section *entity.Section) error {
 	sectionRecord := NewSectionSchema(section)
 

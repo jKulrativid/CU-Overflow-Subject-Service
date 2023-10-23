@@ -9,6 +9,3 @@ down_compose_all:
 
 compose_subject_service:
 	docker compose up --build -d subject-service
-
-compose_subject_service:
-	docker compose up --build -d subject-db

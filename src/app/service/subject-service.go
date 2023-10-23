@@ -235,6 +235,24 @@ func (s *SubjectService) DeleteSubject(ctx context.Context, req *pb.DeleteSubjec
 	return &pb.DeleteSubjectResponse{Subject: SubjectToPb(subject)}, nil
 }
 
+func (s *SubjectService) ValidateSection(ctx context.Context, req *pb.ValidateSectionRequest) (*pb.ValidateSectionResponse, error) {
+	if req.SectionNumber < 1 || req.SectionNumber > 100 {
+		return nil, status.Error(codes.InvalidArgument, "section number must be between 1 and 100")
+	}
+
+	_, err := s.subjectRepo.GetSectionByNumberAndSubjectId(req.SectionNumber, req.SubjectId)
+	if err != nil {
+		switch err {
+		case entity.ErrNotFound:
+			return &pb.ValidateSectionResponse{Valid: false}, nil
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
+	return &pb.ValidateSectionResponse{Valid: true}, nil
+}
+
 func (s *SubjectService) CreateSection(ctx context.Context, req *pb.CreateSectionRequest) (*pb.CreateSectionResponse, error) {
 	if !req.IsAdmin {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
