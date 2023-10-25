@@ -21,9 +21,14 @@ func NewSubjectService(subjectRepo repository.SubjectRepository) *SubjectService
 }
 
 func SubjectToPb(subject *entity.Subject) *pb.Subject {
-	sectionIds := make([]int64, 0)
+	sections := make([]*pb.Section, 0)
 	for _, section := range subject.Sections {
-		sectionIds = append(sectionIds, section.Id)
+		sections = append(sections, &pb.Section{
+			Id:          section.Id,
+			SubjectId:   section.SubjectId,
+			Number:      section.Number,
+			Description: section.Description,
+		})
 	}
 
 	return &pb.Subject{
@@ -31,7 +36,7 @@ func SubjectToPb(subject *entity.Subject) *pb.Subject {
 		SubjectId:     subject.SubjectId,
 		Name:          subject.Name,
 		Semester:      subject.Semester,
-		SectionIds:    sectionIds,
+		Sections:      sections,
 		Year:          subject.Year,
 		Faculty:       subject.Faculty,
 		Description:   subject.Description,
@@ -92,12 +97,17 @@ func (s *SubjectService) PaginateSubjects(ctx context.Context, req *pb.PaginateS
 	}
 
 	for _, subject := range subjects {
+		sectionNumbers := make([]int64, 0)
+		for _, section := range subject.Sections {
+			sectionNumbers = append(sectionNumbers, section.Number)
+		}
 		resp.Subjects = append(resp.Subjects, &pb.SubjectMetadata{
-			Id:        subject.Id,
-			Name:      subject.Name,
-			SubjectId: subject.SubjectId,
-			Semester:  subject.Semester,
-			Year:      subject.Year,
+			Id:             subject.Id,
+			Name:           subject.Name,
+			SubjectId:      subject.SubjectId,
+			Semester:       subject.Semester,
+			Year:           subject.Year,
+			SectionNumbers: sectionNumbers,
 		})
 	}
 
