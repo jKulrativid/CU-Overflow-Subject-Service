@@ -16,6 +16,7 @@ services:
       subject-db:
         condition: service_healthy
   
+  # subject db is for testing only
   subject-db:
     image: postgres:16.0-alpine3.18
     restart: always
