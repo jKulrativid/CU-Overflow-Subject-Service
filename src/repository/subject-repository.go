@@ -32,7 +32,7 @@ func (r *SubjectRepository) PaginateSubjects(pageNumber int64, query map[string]
 	offset, limit := int((pageNumber-1)*r.perPage), int(r.perPage)
 
 	txErr := r.db.Transaction(func(tx *gorm.DB) error {
-		tx = tx.Model(&SubjectSchema{})
+		tx = tx.Model(&SubjectSchema{}).Preload("Sections")
 
 		if hasSubjectId {
 			tx = tx.Where("subject_id = ?", subjectId)
