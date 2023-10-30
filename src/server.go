@@ -18,9 +18,6 @@ import (
 
 func main() {
 	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	dbPort, err := strconv.Atoi(os.Getenv("POSTGRES_PORT"))
 	if err != nil {
