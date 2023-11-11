@@ -182,6 +182,23 @@ func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjec
 		}
 	}
 
+	section := entity.Section{
+		SubjectId:   subject.Id,
+		Number:      1,
+		Description: "legacy object please do not interact with it",
+	}
+
+	if err := s.subjectRepo.CreateSection(&section); err != nil {
+		switch err {
+		case entity.ErrNotFound:
+			return nil, status.Error(codes.InvalidArgument, "subject with given subject id not found")
+		case entity.ErrConstraintViolation:
+			return nil, status.Error(codes.InvalidArgument, "subject already has section with given number")
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
 	return &pb.CreateSubjectResponse{Subject: SubjectToPb(&subject)}, nil
 }
 
