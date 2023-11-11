@@ -16,6 +16,8 @@ import (
 	pb "github.com/jKulrativid/SA-Subject-Service/src/grpc/subject"
 )
 
+var Godogs int
+
 func main() {
 	err := godotenv.Load()
 
