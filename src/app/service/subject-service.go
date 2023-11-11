@@ -199,7 +199,17 @@ func (s *SubjectService) CreateSubject(ctx context.Context, req *pb.CreateSubjec
 		}
 	}
 
-	return &pb.CreateSubjectResponse{Subject: SubjectToPb(&subject)}, nil
+	updatedSubject, err := s.subjectRepo.FindSubjectById(subject.Id)
+	if err != nil {
+		switch err {
+		case entity.ErrNotFound:
+			return nil, status.Error(codes.NotFound, "not found")
+		default:
+			return nil, status.Error(codes.Internal, "internal server error")
+		}
+	}
+
+	return &pb.CreateSubjectResponse{Subject: SubjectToPb(updatedSubject)}, nil
 }
 
 func (s *SubjectService) UpdateSubject(ctx context.Context, req *pb.UpdateSubjectRequest) (*pb.UpdateSubjectResponse, error) {
